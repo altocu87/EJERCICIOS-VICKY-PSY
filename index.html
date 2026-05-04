@@ -14,723 +14,742 @@
     <div id="root"></div>
 
     <script type="text/babel">
-        // PEGA AQUÍ TODO EL CÓDIGO QUE ME PASASTE
-        // (Desde el primer import hasta la última llave del componente App)
+        // EXTRACCIÓN DE HOOKS CRÍTICA PARA EL NAVEGADOR
+        const { useState, useEffect, useRef } = React;
 
-// ─── FONTS ───────────────────────────────────────────────────────────────────
-const FONT_LINK = "https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Playfair+Display:ital,wght@0,700;1,600&display=swap";
-// ─── SQUIRRELS ───────────────────────────────────────────────────────────────
-const SQUIRRELS = [
- { id: "avellana", name: "Avellana", emoji: " ", color: "#c8894a", bg: "#fdf0e0", border: "#f0c88a", desc: "Curiosa y atrevida. Le encanta explorar caminos nuevos." },
- { id: "nuez", name: "Nuez", emoji: " ", color: "#8a6a3a", bg: "#f5ece0", border: "#d4a870", desc: "Tranquila y sabia. Guarda sus bellotas con mucho cuidado." },
- { id: "pipa", name: "Pipa", emoji: " ", color: "#b07030", bg: "#fff8ee", border: "#e8b870", desc: "Alegre y decidida. Corre siempre hacia lo que quiere." },
-];
-// ─── DEFAULT PRIZES ──────────────────────────────────────────────────────────
-const DEFAULT_PRIZES = [
- // Autocuidado físico
- { id:"p01", emoji:" ", name:"Baño con espuma y velas", cost:8, cat:"Autocuidado" },
- { id:"p02", emoji:" ", name:"Masaje de 20 minutos", cost:12, cat:"Autocuidado" },
- { id:"p03", emoji:" ", name:"Paseo largo sin móvil", cost:4, cat:"Autocuidado" },
- { id:"p04", emoji:" ", name:"Siesta sin culpa", cost:3, cat:"Autocuidado" },
- { id:"p05", emoji:" ", name:"Rutina de cremas completa", cost:5, cat:"Autocuidado" },
- { id:"p06", emoji:" ", name:"Flores frescas para casa", cost:7, cat:"Autocuidado" },
- // Ocio y entretenimiento
- { id:"p07", emoji:" ", name:"Maratón de tu serie favorita",cost:6, cat:"Ocio" },
- { id:"p08", emoji:" ", name:"Tarde entera con un libro", cost:4, cat:"Ocio" },
- { id:"p09", emoji:" ", name:"Café especial en tu sitio", cost:5, cat:"Ocio" },
- { id:"p10", emoji:" ", name:"Playlist nueva y bailar sola",cost:2, cat:"Ocio" },
- { id:"p11", emoji:" ", name:"Una hora de juego sin culpa", cost:4, cat:"Ocio" },
- { id:"p12", emoji:" ", name:"Ir al cine tú sola o con alguien",cost:10, cat:"Ocio" },
- // Pequeños caprichos
- { id:"p13", emoji:" ", name:"Tu postre favorito", cost:4, cat:"Capricho" },
- { id:"p14", emoji:" ", name:"Tableta de chocolate de calidad",cost:3,cat:"Capricho" },
- { id:"p15", emoji:" ", name:"Visitar una pastelería chula",cost:6, cat:"Capricho" },
- { id:"p16", emoji:" ", name:"Comprarte algo pequeño bonito",cost:10,cat:"Capricho" },
- { id:"p17", emoji:" ", name:"Vela aromática nueva", cost:7, cat:"Capricho" },
- { id:"p18", emoji:" ", name:"Infusión especial que te gusta",cost:2, cat:"Capricho" },
- // Experiencias
- { id:"p19", emoji:" ", name:"Salida a ver un amanecer", cost:8, cat:"Experiencia" },
- { id:"p20", emoji:" ", name:"Comer fuera sin prisa", cost:10, cat:"Experiencia" },
- { id:"p21", emoji:" ", name:"Tarde en un parque o jardín", cost:5, cat:"Experiencia" },
- { id:"p22", emoji:" ", name:"Quedar con alguien que te guste",cost:8,cat:"Experiencia" },
- { id:"p23", emoji:" ", name:"Tarde creativa: pintar, manualidades",cost:9,cat:"Experiencia" },
- { id:"p24", emoji:" ", name:"Ir a la piscina o spa", cost:15, cat:"Experiencia" },
- { id:"p25", emoji:" ", name:"Escribirte una carta bonita", cost:4, cat:"Experiencia" },
-];
-const CAT_COLORS = {
- Autocuidado: { bg:"#fff0f4", border:"#f8c8d4", text:"#a03050" },
- Ocio: { bg:"#f0f4ff", border:"#c0ccf8", text:"#304090" },
- Capricho: { bg:"#fdf6e0", border:"#f0d890", text:"#806010" },
- Experiencia: { bg:"#eef8f0", border:"#b8e0c0", text:"#206030" },
-};
-// ─── PRACTICE DATA ────────────────────────────────────────────────────────────
-const SIGNALS = ["Noto presión en el abdomen","Noto hinchazón o volumen","Noto gases o movimiento intestinal","Noto tensión abdominal","Noto incomodidad difusa","Noto pulsaciones en el abdomen"];
-const ALARMS = ["Me irrito mucho","Siento miedo de que empeore","Lo rechazo, quiero que desaparezca ya","Empiezo a vigilar y comprobar","Siento que no puedo con esto","Me siento desesperada/o","Me encojo y contengo la respiración","Me aíslo o evito actividades"];
-const EMOTIONS= ["Miedo","Rabia","Frustración","Impotencia","Asco","Desesperación","Ansiedad","Tristeza"];
-const BODY_R = ["Se tensa todo el cuerpo","Aprieto la mandíbula","Contengo la respiración","Me encojo hacia dentro","Se acelera el ritmo cardíaco","Aprieto las manos"];
-const IMPULSES= ["Comprobar si ha mejorado o empeorado","Buscar solución inmediata","Controlar lo que como","Evitar actividades","Quejarme o buscar apoyo urgente","Aislarme"];
-const REGULAT = ["Solté un 5% de tensión en la mandíbula","Hice una exhalación larga y suave","Nombré la sensación con lenguaje neutro","Me orienté mirando 5 cosas a mi alrededor","Me dije: 'esto es incómodo pero no peligroso'","Seguí con mi actividad aunque el síntoma estaba presente"];
-const AFTER = ["Sí, bajó un poco la tensión","Sí, la irritación duró menos","Sí, pude seguir con lo que hacía","Un poco, muy levemente","No noté cambio, pero lo intenté","No lo sé todavía"];
-// ─── HELPERS ─────────────────────────────────────────────────────────────────
-function useLS(key, def) {
- const [val, setVal] = useState(() => { try { const s=localStorage.getItem(key); return s?JSON.parse(s):def; } catch{ return def; }});
- useEffect(()=>{ try{ localStorage.setItem(key,JSON.stringify(val)); }catch{} },[key,val]);
- return [val,setVal];
-}
-function todayStr() { return new Date().toISOString().slice(0,10); }
-function fmtDate(d) { return new Date(d+"T12:00:00").toLocaleDateString("es-ES",{weekday:"long",day:"numeric",month:"long"}); }
-// ─── UI ATOMS ─────────────────────────────────────────────────────────────────
-const S = {
- card: { background:"white", borderRadius:20, padding:"18px 18px", boxShadow:"0 2px 16px rgba(0,0,0,0.06)", border:"1px solid #f0ede8" },
-};
-// SmartSel: desplegable con opción "Otra (personalizada)" que guarda en localStorage
-function Sel({label, options, value, onChange, lsKey}) {
- const storageKey = "sq_custom_" + (lsKey || label || "generic");
- const [customOpts, setCustomOpts] = useState(() => {
- try { const s=localStorage.getItem(storageKey); return s?JSON.parse(s):[]; } catch{ return []; }
- });
- const [showInput, setShowInput] = useState(false);
- const [draft, setDraft] = useState("");
- const allOptions = [...options, ...customOpts];
- const CUSTOM_SENTINEL = "__custom__";
- function handleChange(v) {
- if(v === CUSTOM_SENTINEL) { setShowInput(true); }
- else { setShowInput(false); onChange(v); }
- }
- function saveCustom() {
- const trimmed = draft.trim();
- if(!trimmed) return;
- const updated = customOpts.includes(trimmed) ? customOpts : [...customOpts, trimmed];
- setCustomOpts(updated);
- try { localStorage.setItem(storageKey, JSON.stringify(updated)); } catch{}
- onChange(trimmed);
- setDraft("");
- setShowInput(false);
- }
- function removeCustom(opt, e) {
- e.stopPropagation();
- const updated = customOpts.filter(x=>x!==opt);
- setCustomOpts(updated);
- try { localStorage.setItem(storageKey, JSON.stringify(updated)); } catch{}
- if(value===opt) onChange("");
- }
- return (
- <div style={{marginBottom:14}}>
- {label && <label style={{display:"block",fontSize:12,color:"#9a8a7a",marginBottom:5,fontWeight:700,letterSpacing:"0.4px",textTransform:"uppercase"}}>{label}</label>}
- <select
- value={showInput ? CUSTOM_SENTINEL : value}
- onChange={e=>handleChange(e.target.value)}
- style={{width:"100%",padding:"10px 36px 10px 14px",borderRadius:12,border:`1.5px solid ${value&&!showInput?"#d4b896":"#e8e0d8"}`,background:value&&!showInput?"#fdfaf6":"#faf8f5",color:value&&!showInput?"#3a2a1a":"#bbb0a0",fontSize:14,fontFamily:"'Nunito',sans-serif",outline:"none",cursor:"pointer",appearance:"none",backgroundImage:`url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23c8a878' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E")`,backgroundRepeat:"no-repeat",backgroundPosition:"right 12px center"}}>
- <option value="">Elige una opción…</option>
- {options.length>0 && <optgroup label="Opciones">
- {options.map(o=><option key={o} value={o}>{o}</option>)}
- </optgroup>}
- {customOpts.length>0 && <optgroup label="Mis opciones personalizadas">
- {customOpts.map(o=><option key={o} value={o}>✦ {o}</option>)}
- </optgroup>}
- <option value={CUSTOM_SENTINEL}> Otra (personalizada)…</option>
- </select>
- {/* Custom options chips for deletion */}
- {customOpts.length>0 && !showInput && (
- <div style={{display:"flex",flexWrap:"wrap",gap:5,marginTop:6}}>
- {customOpts.map(o=>(
- <div key={o} style={{display:"flex",alignItems:"center",gap:4,background:"#fdf0dc",border:"1px solid #f0d0a0",borderRadius:20,padding:"2px 8px 2px 10px",fontSize:11,color:"#7a4a1a"}}>
- <span>✦ {o}</span>
- <button onClick={(e)=>removeCustom(o,e)} style={{background:"none",border:"none",cursor:"pointer",color:"#c8894a",fontSize:13,padding:"0 0 0 2px",lineHeight:1,fontWeight:700}}>×</button>
- </div>
- ))}
- </div>
- )}
- {/* Input for new custom option */}
- {showInput && (
- <div style={{marginTop:8,display:"flex",gap:8}}>
- <input
- autoFocus
- value={draft}
- onChange={e=>setDraft(e.target.value)}
- onKeyDown={e=>{ if(e.key==="Enter") saveCustom(); if(e.key==="Escape"){ setShowInput(false); setDraft(""); }}}
- placeholder="Escribe tu opción personalizada…"
- style={{flex:1,padding:"9px 12px",borderRadius:10,border:"1.5px solid #c8894a",background:"#fdfaf6",fontSize:14,fontFamily:"'Nunito',sans-serif",color:"#3a2010",outline:"none"}}
- />
- <button onClick={saveCustom} disabled={!draft.trim()}
- style={{padding:"9px 14px",borderRadius:10,border:"none",background:draft.trim()?"#c8894a":"#f0e8e0",color:draft.trim()?"white":"#c0b0a0",fontSize:13,fontWeight:800,cursor:draft.trim()?"pointer":"default",fontFamily:"'Nunito',sans-serif",flexShrink:0}}>
- ✓
- </button>
- <button onClick={()=>{setShowInput(false);setDraft("");}}
- style={{padding:"9px 12px",borderRadius:10,border:"1.5px solid #e8ddd0",background:"white",color:"#9a8070",fontSize:13,fontWeight:700,cursor:"pointer",fontFamily:"'Nunito',sans-serif",flexShrink:0}}>
- ✕
- </button>
- </div>
- )}
- </div>
- );
-}
-function TA({label,value,onChange,placeholder}) {
- return (
- <div style={{marginBottom:14}}>
- {label && <label style={{display:"block",fontSize:12,color:"#9a8a7a",marginBottom:5,fontWeight:700,letterSpacing:"0.4px",textTransform:"uppercase"}}>{label}</label>}
- <textarea value={value} onChange={e=>onChange(e.target.value)} placeholder={placeholder} rows={3}
- style={{width:"100%",padding:"10px 14px",borderRadius:12,border:"1.5px solid #e8e0d8",background:"#faf8f5",color:"#3a2a1a",fontSize:14,fontFamily:"'Nunito',sans-serif",outline:"none",resize:"vertical",boxSizing:"border-box"}} />
- </div>
- );
-}
-function Dots({total,current,doneColor="#c8894a"}) {
- return (
- <div style={{display:"flex",gap:6,alignItems:"center",marginBottom:18,flexWrap:"wrap"}}>
- {Array.from({length:total},(_,i)=>(
- <div key={i} style={{display:"flex",alignItems:"center",gap:6}}>
- <div style={{width:26,height:26,borderRadius:"50%",background:i<current?"#c8894a":i===current?"#e8a060":"#f0ebe4",color:i<=current?"white":"#c8b8a8",display:"flex",alignItems:"center",justifyContent:"center",fontSize:11,fontWeight:800,transition:"all .3s",flexShrink:0}}>
- {i<current?"✓":i+1}
- </div>
- {i<total-1&&<div style={{width:16,height:2,background:i<current?"#c8894a":"#f0ebe4",borderRadius:2}}/>}
- </div>
- ))}
- </div>
- );
-}
-function NextBtn({valid,onNext,last,accent="#c8894a"}) {
- return (
- <button onClick={valid?onNext:undefined} disabled={!valid}
- style={{width:"100%",padding:"12px",borderRadius:14,border:"none",background:valid?`linear-gradient(135deg,${accent},${accent}cc)`:"#f0ebe4",color:valid?"white":"#c8b8a8",fontSize:14,fontWeight:800,fontFamily:"'Nunito',sans-serif",cursor:valid?"pointer":"default",transition:"all .2s",marginTop:4}}>
- {last?" Completar y ganar bellotas →":"Siguiente →"}
- </button>
- );
-}
-// ─── PRACTICES ───────────────────────────────────────────────────────────────
-function P1({onDone}) {
- const [s,setS]=useState(0);
- const [d,setD]=useState({signal:"",alarm:"",tension:""});
- const steps=[
- {t:"¿Qué señal notas en el abdomen?",c:<Sel label="Señal corporal" options={SIGNALS} value={d.signal} onChange={v=>setD(x=>({...x,signal:v}))} lsKey="signals"/>,ok:!!d.signal},
- {t:"¿Qué alarma aparece?",c:<Sel label="Alarma detectada" options={ALARMS} value={d.alarm} onChange={v=>setD(x=>({...x,alarm:v}))} lsKey="alarms"/>,ok:!!d.alarm},
- {t:"Frase reguladora",c:(<div style={{padding:"14px 16px",background:"#fdf6ee",borderRadius:14,border:"1px solid #e8d0a8",marginBottom:14}}><p style={{margin:0,fontSize:15,color:"#5a3a1a",fontFamily:"'Playfair Display',serif",fontStyle:"italic",lineHeight:1.7}}>"Esto es incómodo, pero ahora mismo puedo observarlo sin pelear."</p></div>),ok:true},
- {t:"Suelta un 5% de tensión",c:(
- <div style={{display:"flex",flexDirection:"column",gap:8,marginBottom:14}}>
- {["Mandíbula → ","Hombros → ","Manos → ","Abdomen → "].map(z=>(
- <div key={z} onClick={()=>setD(x=>({...x,tension:z}))} style={{padding:"10px 14px",borderRadius:12,border:`1.5px solid ${d.tension===z?"#c8894a":"#e8e0d8"}`,background:d.tension===z?"#fdf0e0":"#faf8f5",color:"#3a2a1a",fontSize:14,fontFamily:"'Nunito',sans-serif",cursor:"pointer",transition:"all .2s"}}>{z}</div>
- ))}
- </div>
- ),ok:!!d.tension},
- ];
- const cur=steps[s];
- return (
- <div>
- <Dots total={steps.length} current={s}/>
- <div style={{background:"#fdf6ee",borderRadius:14,padding:"12px 16px",marginBottom:16,border:"1px solid #f0dfc0"}}>
- <p style={{margin:0,fontSize:15,fontWeight:800,color:"#7a4a1a"}}>{cur.t}</p>
- </div>
- {cur.c}
- <div style={{display:"flex",gap:8}}>
- {s>0&&<button onClick={()=>setS(x=>x-1)} style={{flex:1,padding:"12px",borderRadius:14,border:"1.5px solid #e8ddd0",background:"white",color:"#9a8070",fontSize:14,fontFamily:"'Nunito',sans-serif",cursor:"pointer"}}>← Atrás</button>}
- <div style={{flex:2}}><NextBtn valid={cur.ok} onNext={()=>s<steps.length-1?setS(x=>x+1):onDone(d)} last={s===steps.length-1}/></div>
- </div>
- </div>
- );
-}
-function P2({onDone}) {
- const [s,setS]=useState(0);
- const [d,setD]=useState({signal:"",thought:"",emotion:"",body:"",impulse:"",need:""});
- const steps=[
- {t:"¿Qué sensación aparece?",c:<Sel label="Señal corporal" options={SIGNALS} value={d.signal} onChange={v=>setD(x=>({...x,signal:v}))} lsKey="signals"/>,ok:!!d.signal},
- {t:"¿Qué pensamiento automático viene?",c:<TA label="Pensamiento automático" value={d.thought} onChange={v=>setD(x=>({...x,thought:v}))} placeholder="Escribe lo primero que piensas al notar la sensación…"/>,ok:!!d.thought},
- {t:"¿Qué emoción se activa?",c:<Sel label="Emoción principal" options={EMOTIONS} value={d.emotion} onChange={v=>setD(x=>({...x,emotion:v}))} lsKey="emotions"/>,ok:!!d.emotion},
- {t:"¿Qué hace tu cuerpo?",c:<Sel label="Respuesta corporal" options={BODY_R} value={d.body} onChange={v=>setD(x=>({...x,body:v}))} lsKey="body"/>,ok:!!d.body},
- {t:"¿Qué impulso aparece?",c:<Sel label="Impulso detectado" options={IMPULSES} value={d.impulse} onChange={v=>setD(x=>({...x,impulse:v}))} lsKey="impulses"/>,ok:!!d.impulse},
- {t:"¿Qué necesitaría tu sistema ahora?",c:(<><div style={{padding:"10px 14px",background:"#fdf6ee",borderRadius:12,marginBottom:10,border:"1px solid #f0dfc0"}}><p style={{margin:0,fontSize:12,color:"#9a7040",fontStyle:"italic"}}>¿Estoy respondiendo a la señal o a la alarma alrededor de ella?</p></div><TA label="Necesidad del sistema" value={d.need} onChange={v=>setD(x=>({...x,need:v}))} placeholder="Una respiración lenta, notar el apoyo del suelo…"/></>),ok:!!d.need},
- ];
- const cur=steps[s];
- return (
- <div>
- <Dots total={steps.length} current={s}/>
- <div style={{background:"#fdf6ee",borderRadius:14,padding:"12px 16px",marginBottom:16,border:"1px solid #f0dfc0"}}>
- <p style={{margin:0,fontSize:15,fontWeight:800,color:"#7a4a1a"}}>{cur.t}</p>
- </div>
- {cur.c}
- <div style={{display:"flex",gap:8}}>
- {s>0&&<button onClick={()=>setS(x=>x-1)} style={{flex:1,padding:"12px",borderRadius:14,border:"1.5px solid #e8ddd0",background:"white",color:"#9a8070",fontSize:14,fontFamily:"'Nunito',sans-serif",cursor:"pointer"}}>← Atrás</button>}
- <div style={{flex:2}}><NextBtn valid={cur.ok} onNext={()=>s<steps.length-1?setS(x=>x+1):onDone(d)} last={s===steps.length-1}/></div>
- </div>
- </div>
- );
-}
-function P3({onDone}) {
- const [ch,setCh]=useState({});
- const items=[
- {k:"orient",i:" ",t:"Mira lentamente a tu alrededor y nombra 5 cosas que ves."},
- {k:"support",i:" ",t:"Nota 3 puntos de apoyo: pies, espalda, manos o contacto con la silla."},
- {k:"exhale",i:" ",t:"Exhala un poco más largo de lo habitual, sin forzar."},
- {k:"release",i:" ",t:"Afloja un 5% alguna zona: mandíbula, hombros, manos, abdomen."},
- {k:"phrase",i:" ",t:'"Ahora estoy aquí; en este momento no necesito resolverlo todo."'},
- {k:"return",i:" ",t:"Vuelve a la actividad que estabas haciendo, aunque sea despacio."},
- ];
- const all=items.every(x=>ch[x.k]);
- return (
- <div>
- <div style={{background:"#fdf6ee",borderRadius:12,padding:"10px 14px",marginBottom:14,border:"1px solid #f0dfc0"}}>
- <p style={{margin:0,fontSize:12,color:"#9a7040"}}>Marca cada paso al completarlo.</p>
- </div>
- <div style={{display:"flex",flexDirection:"column",gap:8,marginBottom:16}}>
- {items.map(x=>(
- <div key={x.k} onClick={()=>setCh(c=>({...c,[x.k]:!c[x.k]}))}
- style={{display:"flex",gap:12,alignItems:"flex-start",padding:"11px 14px",borderRadius:12,background:ch[x.k]?"#fdf0e0":"#faf8f5",border:`1.5px solid ${ch[x.k]?"#c8894a":"#e8e0d8"}`,cursor:"pointer",transition:"all .2s"}}>
- <div style={{width:22,height:22,borderRadius:6,border:`2px solid ${ch[x.k]?"#c8894a":"#d4c4b0"}`,background:ch[x.k]?"#c8894a":"white",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,fontSize:12,color:"white",marginTop:1}}>{ch[x.k]?"✓":""}</div>
- <span style={{fontSize:14,color:ch[x.k]?"#7a4a1a":"#5a4a3a",fontFamily:"'Nunito',sans-serif",textDecoration:ch[x.k]?"line-through":"none",opacity:ch[x.k]?.7:1}}><span style={{marginRight:6}}>{x.i}</span>{x.t}</span>
- </div>
- ))}
- </div>
- <NextBtn valid={all} onNext={()=>onDone(ch)} last accent="#c8894a"/>
- </div>
- );
-}
-function PReg({onDone}) {
- const [s,setS]=useState(0);
- const [d,setD]=useState({situation:"",signal:"",alarm:"",habitual:"",newResponse:"",after:""});
- const steps=[
- {t:"Situación",c:<TA label="¿Dónde estabas y qué hacías?" value={d.situation} onChange={v=>setD(x=>({...x,situation:v}))} placeholder="Ej: en casa trabajando, en el transporte…"/>,ok:!!d.situation},
- {t:"Señal",c:<Sel label="¿Qué notaste en el abdomen?" options={SIGNALS} value={d.signal} onChange={v=>setD(x=>({...x,signal:v}))} lsKey="signals"/>,ok:!!d.signal},
- {t:"Alarma",c:<Sel label="¿Qué pensamiento, emoción o impulso apareció?" options={ALARMS} value={d.alarm} onChange={v=>setD(x=>({...x,alarm:v}))} lsKey="alarms"/>,ok:!!d.alarm},
- {t:"Respuesta habitual",c:<Sel label="¿Qué hiciste?" options={["Vigilar y comprobar","Pelear contra el síntoma","Controlar la alimentación","Evitar actividades","Buscar soluciones inmediatas","Aislarme"]} value={d.habitual} onChange={v=>setD(x=>({...x,habitual:v}))} lsKey="habitual"/>,ok:!!d.habitual},
- {t:"Nueva respuesta",c:<Sel label="¿Qué probé para reducir la alarma?" options={REGULAT} value={d.newResponse} onChange={v=>setD(x=>({...x,newResponse:v}))} lsKey="regulat"/>,ok:!!d.newResponse},
- {t:"Después",c:<Sel label="¿Hubo algún cambio?" options={AFTER} value={d.after} onChange={v=>setD(x=>({...x,after:v}))} lsKey="after"/>,ok:!!d.after},
- ];
- const cur=steps[s];
- return (
- <div>
- <Dots total={steps.length} current={s}/>
- <div style={{background:"#fdf6ee",borderRadius:14,padding:"12px 16px",marginBottom:16,border:"1px solid #f0dfc0"}}>
- <p style={{margin:0,fontSize:15,fontWeight:800,color:"#7a4a1a"}}>{cur.t}</p>
- </div>
- {cur.c}
- <div style={{display:"flex",gap:8}}>
- {s>0&&<button onClick={()=>setS(x=>x-1)} style={{flex:1,padding:"12px",borderRadius:14,border:"1.5px solid #e8ddd0",background:"white",color:"#9a8070",fontSize:14,fontFamily:"'Nunito',sans-serif",cursor:"pointer"}}>← Atrás</button>}
- <div style={{flex:2}}><NextBtn valid={cur.ok} onNext={()=>s<steps.length-1?setS(x=>x+1):onDone(d)} last={s===steps.length-1}/></div>
- </div>
- </div>
- );
-}
-// ─── PRACTICES CONFIG ────────────────────────────────────────────────────────
-const PRACTICES=[
- {id:"p1",num:"01",title:"Señal y alarma",sub:"Observar sin pelear",icon:" ",acorns:1,comp:P1},
- {id:"p2",num:"02",title:"Mapa de hiperalerta",sub:"Ampliar conciencia",icon:" ",acorns:2,comp:P2},
- {id:"p3",num:"03",title:"Orientación suave",sub:"Volver al presente",icon:" ",acorns:1,comp:P3},
- {id:"reg",num:" ",title:"Registro diario",sub:"Observar el patrón",icon:" ",acorns:2,comp:PReg},
-];
-// ─── EXPORT FORMATTER ────────────────────────────────────────────────────────
-function buildExport(days, allSessions, squirrel, totalAcorns) {
- let txt = ` *Diario de regulación de ${squirrel?.name || "Ardilla"}*\n\n`;
- days.forEach(day => {
- const sessions = (allSessions[day]||[]);
- if(!sessions.length) return;
- txt += `━━━━━━━━━━━━━━━━━━━━━\n *${fmtDate(day)}*\n`;
- sessions.forEach((s,i)=>{
- txt += `\n *Sesión ${i+1} · ${s.practice}* ${s.time} (+${s.acorns} )\n`;
- const d=s.data||{};
- if(d.signal) txt+=` Señal: ${d.signal}\n`;
- if(d.alarm) txt+=` Alarma: ${d.alarm}\n`;
- if(d.thought) txt+=` Pensamiento: ${d.thought}\n`;
- if(d.emotion) txt+=` Emoción: ${d.emotion}\n`;
- if(d.body) txt+=` Cuerpo: ${d.body}\n`;
- if(d.impulse) txt+=` Impulso: ${d.impulse}\n`;
- if(d.need) txt+=` Necesidad: ${d.need}\n`;
- if(d.tension) txt+=` Soltado: ${d.tension}\n`;
- if(d.situation) txt+=` Situación: ${d.situation}\n`;
- if(d.habitual) txt+=` Habitual: ${d.habitual}\n`;
- if(d.newResponse) txt+=` Nuevo: ${d.newResponse}\n`;
- if(d.after) txt+=` Después: ${d.after}\n`;
- });
- txt+="\n";
- });
- txt+=`━━━━━━━━━━━━━━━━━━━━━\n Total bellotas acumuladas: ${totalAcorns}\n`;
- txt+=` _"No todo lo incómodo es peligroso."_`;
- return txt;
-}
-// ─── MAIN APP ─────────────────────────────────────────────────────────────────
-export default function App() {
- const [squirrel, setSquirrel] = useLS("sq_squirrel", null);
- const [acorns, setAcorns] = useLS("sq_acorns", 0);
- const [sessions, setSessions] = useLS("sq_sessions", {}); // {date: [...]}
- const [prizes, setPrizes] = useLS("sq_prizes", DEFAULT_PRIZES);
- const [wishlist, setWishlist] = useLS("sq_wishlist", []); // [{prizeId, addedAt}]
- const [redeemed, setRedeemed] = useLS("sq_redeemed", []); // [{prizeId, at, acornsCost}]
- const [view, setView] = useState("home");
- const [activePractice, setActive] = useState(null);
- const [toast, setToast] = useState(null);
- const [shopFilter, setShopFilter] = useState("Todos");
- const [newPrize, setNewPrize] = useState({emoji:" ",name:"",cost:"",cat:"Autocuidado"});
- const [addingPrize, setAddingPrize]=useState(false);
- const [exportDays, setExportDays] = useState({});
- const [copied, setCopied] = useState(false);
- // onboarding
- if (!squirrel) return <OnboardingScreen onChoose={s=>{setSquirrel(s);}} />;
- const today = todayStr();
- const todaySessions = sessions[today]||[];
- const allDays = Object.keys(sessions).sort().reverse();
- function showToast(msg, dur=3000) {
- setToast(msg);
- setTimeout(()=>setToast(null), dur);
- }
- function handlePracticeDone(practice, data) {
- const session = { id:Date.now(), practice:practice.title, acorns:practice.acorns, time:new Date().toLocaleTimeString("es-ES",{hour:"2-digit",minute:"2-digit"}), data };
- setSessions(s => ({ ...s, [today]: [...(s[today]||[]), session] }));
- setAcorns(a => a + practice.acorns);
- setView("home");
- setActive(null);
- showToast(` +${practice.acorns} bellota${practice.acorns>1?"s":""} para ${squirrel.name}!`);
- }
- function redeemPrize(prize) {
- if(acorns < prize.cost) { showToast(" ¡No tienes suficientes bellotas!"); return; }
- setAcorns(a=>a-prize.cost);
- setRedeemed(r=>[...r,{prizeId:prize.id,name:prize.name,emoji:prize.emoji,at:new Date().toISOString(),acornsCost:prize.cost}]);
- showToast(` ¡${prize.emoji} ${prize.name} canjeado!`);
- }
- function toggleWish(prize) {
- if(wishlist.find(w=>w.prizeId===prize.id)) {
- setWishlist(w=>w.filter(x=>x.prizeId!==prize.id));
- } else {
- setWishlist(w=>[...w,{prizeId:prize.id,name:prize.name,emoji:prize.emoji,addedAt:new Date().toISOString()}]);
- }
- }
- function addCustomPrize() {
- if(!newPrize.name||!newPrize.cost) return;
- const np={...newPrize, id:"c"+Date.now(), cost:parseInt(newPrize.cost)||5};
- setPrizes(p=>[...p,np]);
- setNewPrize({emoji:" ",name:"",cost:"",cat:"Autocuidado"});
- setAddingPrize(false);
- showToast(" Premio añadido a la tienda");
- }
- function doExport() {
- const chosen = Object.keys(exportDays).filter(d=>exportDays[d]);
- if(!chosen.length){ showToast("Selecciona al menos un día"); return; }
- const txt = buildExport(chosen.sort(), sessions, squirrel, acorns);
- navigator.clipboard.writeText(txt).then(()=>{ setCopied(true); setTimeout(()=>setCopied(false),2500); });
- }
- const isInWish = (id) => !!wishlist.find(w=>w.prizeId===id);
- const cats = ["Todos","Autocuidado","Ocio","Capricho","Experiencia"];
- const filteredPrizes = shopFilter==="Todos" ? prizes : prizes.filter(p=>p.cat===shopFilter);
- // Tab bar
- const tabs=[
- {k:"home",icon:" ",label:"Inicio"},
- {k:"shop",icon:" ",label:"Tienda"},
- {k:"history",icon:" ",label:"Historial"},
- {k:"export",icon:" ",label:"Exportar"},
- ];
- return (
- <div style={{fontFamily:"'Nunito',sans-serif",minHeight:"100vh",background:"linear-gradient(160deg,#fdf8f0 0%,#fef6e8 60%,#f8f0e8 100%)"}}>
- <link href={FONT_LINK} rel="stylesheet"/>
- <style>{`
- @keyframes slideDown{from{opacity:0;transform:translateX(-50%) translateY(-16px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
- @keyframes acornPop{0%{transform:scale(0.7);opacity:0}60%{transform:scale(1.15)}100%{transform:scale(1);opacity:1}}
- * { box-sizing:border-box; }
- ::-webkit-scrollbar{width:6px} ::-webkit-scrollbar-track{background:transparent} ::-webkit-scrollbar-thumb{background:#e0d0c0;border-radius:4px}
- `}</style>
- {/* TOAST */}
- {toast && (
- <div style={{position:"fixed",top:18,left:"50%",transform:"translateX(-50%)",background:"#3a2a1a",color:"white",borderRadius:16,padding:"11px 22px",zIndex:9999,boxShadow:"0 8px 24px rgba(0,0,0,.18)",animation:"slideDown .35s ease",whiteSpace:"nowrap",maxWidth:"90vw",fontSize:14,fontWeight:700}}>
- {toast}
- </div>
- )}
- <div style={{maxWidth:460,margin:"0 auto",padding:"0 16px 90px"}}>
- {/* HEADER */}
- <div style={{paddingTop:22,paddingBottom:4}}>
- <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
- <div>
- <h1 style={{margin:0,fontSize:20,fontWeight:900,color:"#3a2010",fontFamily:"'Playfair Display',serif",letterSpacing:"-.3px"}}>
- {squirrel.emoji} {squirrel.name}
- </h1>
- <p style={{margin:"2px 0 0",fontSize:12,color:"#b09070"}}>Regulación del sistema nervioso</p>
- </div>
- <div style={{textAlign:"right"}}>
- <div style={{fontSize:26,fontWeight:900,color:"#c8894a",fontFamily:"'Playfair Display',serif",lineHeight:1}}>
- {acorns} <span style={{fontSize:18}}> </span>
- </div>
- <p style={{margin:0,fontSize:11,color:"#b09070"}}>bellotas</p>
- </div>
- </div>
- </div>
- {/* ── HOME ── */}
- {view==="home" && !activePractice && (
- <div>
- <div style={{...S.card,margin:"14px 0",padding:"16px 18px",background:"linear-gradient(135deg,#fdf0dc,#fae8c8)",border:"1.5px solid #f0d09a"}}>
- <p style={{margin:0,fontSize:13,color:"#7a4a1a",lineHeight:1.6,fontStyle:"italic",fontFamily:"'Playfair Display',serif"}}>
- "No todo lo incómodo es peligroso."
- </p>
- <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginTop:10}}>
- <span style={{fontSize:12,color:"#b09060"}}>Sesiones hoy: <b>{todaySessions.length}</b></span>
- <span style={{fontSize:12,color:"#b09060"}}>Bellotas hoy: <b>{todaySessions.reduce((a,s)=>a+s.acorns,0)} </b></span>
- </div>
- </div>
- <p style={{fontSize:12,color:"#b09070",margin:"0 0 12px",textTransform:"uppercase",letterSpacing:"0.6px",fontWeight:700}}>Elige una práctica</p>
- <div style={{display:"flex",flexDirection:"column",gap:10}}>
- {PRACTICES.map(p=>(
- <div key={p.id} onClick={()=>{setActive(p);setView("practice");}}
- style={{...S.card,display:"flex",alignItems:"center",gap:14,cursor:"pointer",transition:"transform .15s, box-shadow .15s",padding:"14px 16px"}}
- onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-1px)";e.currentTarget.style.boxShadow="0 6px 24px rgba(0,0,0,.1)"}}
- onMouseLeave={e=>{e.currentTarget.style.transform="";e.currentTarget.style.boxShadow=S.card.boxShadow}}>
- <div style={{width:46,height:46,borderRadius:14,background:"#fdf0dc",display:"flex",alignItems:"center",justifyContent:"center",fontSize:22,flexShrink:0,border:"1px solid #f0d8a8"}}>
- {p.icon}
- </div>
- <div style={{flex:1}}>
- <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
- <span style={{fontSize:10,color:"#c8894a",fontWeight:700,textTransform:"uppercase",letterSpacing:"0.5px"}}>Práctica {p.num}</span>
- <span style={{fontSize:12,background:"#fdf0dc",color:"#8a5a1a",padding:"2px 9px",borderRadius:8,fontWeight:800,border:"1px solid #f0d0a0"}}>+{p.acorns} </span>
- </div>
- <p style={{margin:"3px 0 1px",fontSize:15,fontWeight:800,color:"#3a2010"}}>{p.title}</p>
- <p style={{margin:0,fontSize:12,color:"#b09070"}}>{p.sub}</p>
- </div>
- <span style={{color:"#c8894a",fontSize:18}}>›</span>
- </div>
- ))}
- </div>
- {wishlist.length>0 && (
- <div style={{...S.card,margin:"16px 0",padding:"14px 16px"}}>
- <p style={{margin:"0 0 10px",fontSize:12,color:"#b09070",fontWeight:700,textTransform:"uppercase",letterSpacing:"0.5px"}}>Lista de deseos </p>
- {wishlist.map(w=>(
- <div key={w.prizeId} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"6px 0",borderBottom:"1px solid #f5ede0"}}>
- <span style={{fontSize:14,color:"#3a2010"}}>{w.emoji} {w.name}</span>
- <span style={{fontSize:11,color:"#c8894a",fontWeight:700}}>{prizes.find(p=>p.id===w.prizeId)?.cost||"?"} </span>
- </div>
- ))}
- </div>
- )}
- </div>
- )}
- {/* ── PRACTICE VIEW ── */}
- {view==="practice" && activePractice && (
- <div>
- <button onClick={()=>{setView("home");setActive(null);}} style={{background:"none",border:"none",color:"#c8894a",fontSize:14,fontFamily:"'Nunito',sans-serif",cursor:"pointer",marginBottom:14,padding:0,display:"flex",alignItems:"center",gap:6,fontWeight:700}}>
- ← Volver
- </button>
- <div style={{...S.card}}>
- <div style={{marginBottom:16}}>
- <span style={{fontSize:28}}>{activePractice.icon}</span>
- <h2 style={{margin:"8px 0 2px",fontSize:18,fontWeight:900,color:"#3a2010",fontFamily:"'Playfair Display',serif"}}>{activePractice.title}</h2>
- <p style={{margin:0,fontSize:13,color:"#b09070"}}>{activePractice.sub} · <b style={{color:"#c8894a"}}>+{activePractice.acorns} </b></p>
- </div>
- <activePractice.comp onDone={(d)=>handlePracticeDone(activePractice,d)}/>
- </div>
- </div>
- )}
- {/* ── SHOP ── */}
- {view==="shop" && (
- <div>
- <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",margin:"14px 0 6px"}}>
- <h2 style={{margin:0,fontSize:18,fontWeight:900,color:"#3a2010",fontFamily:"'Playfair Display',serif"}}>Tienda de premios</h2>
- <div style={{background:"#fdf0dc",borderRadius:10,padding:"5px 12px",border:"1px solid #f0d0a0"}}>
- <span style={{fontSize:14,fontWeight:800,color:"#c8894a"}}>{acorns} </span>
- </div>
- </div>
- {/* Category filter */}
- <div style={{display:"flex",gap:6,overflowX:"auto",paddingBottom:4,marginBottom:14}}>
- {cats.map(c=>(
- <button key={c} onClick={()=>setShopFilter(c)}
- style={{flexShrink:0,padding:"6px 14px",borderRadius:20,border:`1.5px solid ${shopFilter===c?"#c8894a":"#e8ddd0"}`,background:shopFilter===c?"#fdf0dc":"white",color:shopFilter===c?"#7a4a1a":"#9a8070",fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"'Nunito',sans-serif",transition:"all .2s"}}>
- {c}
- </button>
- ))}
- </div>
- <div style={{display:"flex",flexDirection:"column",gap:10,marginBottom:14}}>
- {filteredPrizes.map(p=>{
- const catC=CAT_COLORS[p.cat]||{bg:"#f8f5f0",border:"#e8e0d0",text:"#5a4a3a"};
- const canAfford=acorns>=p.cost;
- const inWish=isInWish(p.id);
- return (
- <div key={p.id} style={{...S.card,padding:"13px 16px",opacity:canAfford?1:0.75}}>
- <div style={{display:"flex",alignItems:"center",gap:12}}>
- <div style={{fontSize:26,flexShrink:0}}>{p.emoji}</div>
- <div style={{flex:1}}>
- <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:2}}>
- <span style={{fontSize:10,background:catC.bg,color:catC.text,padding:"1px 7px",borderRadius:6,fontWeight:700,border:`1px solid ${catC.border}`}}>{p.cat}</span>
- <span style={{fontSize:12,fontWeight:800,color:canAfford?"#c8894a":"#c0a888"}}>{p.cost} </span>
- </div>
- <p style={{margin:0,fontSize:14,fontWeight:700,color:"#3a2010"}}>{p.name}</p>
- </div>
- </div>
- <div style={{display:"flex",gap:8,marginTop:10}}>
- <button onClick={()=>toggleWish(p)}
- style={{flex:1,padding:"8px",borderRadius:10,border:`1.5px solid ${inWish?"#f4c0a0":"#e8ddd0"}`,background:inWish?"#fdf6ee":"white",color:inWish?"#c8694a":"#9a8070",fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"'Nunito',sans-serif"}}>
- {inWish?" En lista":"♡ Deseo"}
- </button>
- <button onClick={()=>redeemPrize(p)} disabled={!canAfford}
- style={{flex:2,padding:"8px",borderRadius:10,border:"none",background:canAfford?"linear-gradient(135deg,#c8894a,#e8a060)":"#f0e8e0",color:canAfford?"white":"#c0b0a0",fontSize:12,fontWeight:800,cursor:canAfford?"pointer":"default",fontFamily:"'Nunito',sans-serif",transition:"all .2s"}}>
- {canAfford?" Canjear":"Faltan "+(p.cost-acorns)+" "}
- </button>
- </div>
- </div>
- );
- })}
- </div>
- {/* Add custom prize */}
- {!addingPrize ? (
- <button onClick={()=>setAddingPrize(true)}
- style={{width:"100%",padding:"12px",borderRadius:14,border:"2px dashed #e0d0c0",background:"transparent",color:"#c8a070",fontSize:14,fontWeight:700,cursor:"pointer",fontFamily:"'Nunito',sans-serif"}}>
- + Añadir premio personalizado
- </button>
- ):(
- <div style={{...S.card,marginBottom:8}}>
- <p style={{margin:"0 0 12px",fontSize:14,fontWeight:800,color:"#3a2010"}}>Nuevo premio</p>
- <div style={{display:"flex",gap:8,marginBottom:10}}>
- <input value={newPrize.emoji} onChange={e=>setNewPrize(x=>({...x,emoji:e.target.value}))}
- style={{width:56,padding:"9px",borderRadius:10,border:"1.5px solid #e8ddd0",background:"#faf8f5",fontSize:18,textAlign:"center",outline:"none"}}/>
- <input value={newPrize.name} onChange={e=>setNewPrize(x=>({...x,name:e.target.value}))}
- placeholder="Nombre del premio…" style={{flex:1,padding:"9px 12px",borderRadius:10,border:"1.5px solid #e8ddd0",background:"#faf8f5",fontSize:14,fontFamily:"'Nunito',sans-serif",color:"#3a2010",outline:"none"}}/>
- </div>
- <div style={{display:"flex",gap:8,marginBottom:12}}>
- <input type="number" value={newPrize.cost} onChange={e=>setNewPrize(x=>({...x,cost:e.target.value}))}
- placeholder=" coste" style={{width:90,padding:"9px 12px",borderRadius:10,border:"1.5px solid #e8ddd0",background:"#faf8f5",fontSize:14,fontFamily:"'Nunito',sans-serif",color:"#3a2010",outline:"none"}}/>
- <select value={newPrize.cat} onChange={e=>setNewPrize(x=>({...x,cat:e.target.value}))}
- style={{flex:1,padding:"9px 12px",borderRadius:10,border:"1.5px solid #e8ddd0",background:"#faf8f5",fontSize:14,fontFamily:"'Nunito',sans-serif",color:"#3a2010",outline:"none"}}>
- {["Autocuidado","Ocio","Capricho","Experiencia"].map(c=><option key={c}>{c}</option>)}
- </select>
- </div>
- <div style={{display:"flex",gap:8}}>
- <button onClick={()=>setAddingPrize(false)} style={{flex:1,padding:"10px",borderRadius:12,border:"1.5px solid #e8ddd0",background:"white",color:"#9a8070",fontSize:13,fontWeight:700,cursor:"pointer",fontFamily:"'Nunito',sans-serif"}}>Cancelar</button>
- <button onClick={addCustomPrize} disabled={!newPrize.name||!newPrize.cost}
- style={{flex:2,padding:"10px",borderRadius:12,border:"none",background:(newPrize.name&&newPrize.cost)?"linear-gradient(135deg,#c8894a,#e8a060)":"#f0e8e0",color:(newPrize.name&&newPrize.cost)?"white":"#c0b0a0",fontSize:13,fontWeight:800,cursor:(newPrize.name&&newPrize.cost)?"pointer":"default",fontFamily:"'Nunito',sans-serif"}}>
- ✓ Añadir
- </button>
- </div>
- </div>
- )}
- {/* Redeemed */}
- {redeemed.length>0&&(
- <div style={{...S.card,marginTop:14,padding:"14px 16px"}}>
- <p style={{margin:"0 0 10px",fontSize:12,color:"#b09070",fontWeight:700,textTransform:"uppercase",letterSpacing:"0.5px"}}>Premios canjeados ✓</p>
- {redeemed.slice().reverse().map((r,i)=>(
- <div key={i} style={{display:"flex",justifyContent:"space-between",padding:"5px 0",borderBottom:"1px solid #f5ede0",fontSize:13,color:"#7a5a3a"}}>
- <span>{r.emoji} {r.name}</span>
- <span style={{color:"#c8894a",fontWeight:700}}>-{r.acornsCost} </span>
- </div>
- ))}
- </div>
- )}
- </div>
- )}
- {/* ── HISTORY ── */}
- {view==="history" && (
- <div>
- <h2 style={{margin:"14px 0 14px",fontSize:18,fontWeight:900,color:"#3a2010",fontFamily:"'Playfair Display',serif"}}>Historial</h2>
- {allDays.length===0 ? (
- <div style={{...S.card,textAlign:"center",padding:"36px 20px"}}>
- <p style={{fontSize:32,margin:"0 0 8px"}}> </p>
- <p style={{fontSize:14,color:"#b09070",margin:0}}>Aún no hay sesiones registradas.<br/>¡Empieza con una práctica!</p>
- </div>
- ):(
- allDays.map(day=>(
- <div key={day} style={{...S.card,marginBottom:12,padding:"14px 16px"}}>
- <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
- <span style={{fontSize:14,fontWeight:800,color:"#3a2010"}}>{fmtDate(day)}</span>
- <span style={{fontSize:12,background:"#fdf0dc",color:"#c8894a",padding:"2px 10px",borderRadius:8,fontWeight:800,border:"1px solid #f0d0a0"}}>
- {(sessions[day]||[]).reduce((a,s)=>a+s.acorns,0)} 
- </span>
- </div>
- {(sessions[day]||[]).map((s,i)=>(
- <div key={s.id} style={{padding:"8px 10px",background:"#faf6f0",borderRadius:10,marginBottom:6}}>
- <div style={{display:"flex",justifyContent:"space-between"}}>
- <span style={{fontSize:13,fontWeight:700,color:"#5a3a1a"}}>{s.practice}</span>
- <span style={{fontSize:11,color:"#b09070"}}> {s.time} · +{s.acorns} </span>
- </div>
- {s.data?.signal&&<p style={{margin:"3px 0 0",fontSize:12,color:"#7a6050"}}> {s.data.signal}</p>}
- {s.data?.newResponse&&<p style={{margin:"2px 0 0",fontSize:12,color:"#7a6050"}}> {s.data.newResponse}</p>}
- {s.data?.after&&<p style={{margin:"2px 0 0",fontSize:12,color:"#7a6050"}}> {s.data.after}</p>}
- </div>
- ))}
- </div>
- ))
- )}
- </div>
- )}
- {/* ── EXPORT ── */}
- {view==="export" && (
- <div>
- <h2 style={{margin:"14px 0 6px",fontSize:18,fontWeight:900,color:"#3a2010",fontFamily:"'Playfair Display',serif"}}>Exportar a WhatsApp</h2>
- <p style={{fontSize:13,color:"#b09070",margin:"0 0 16px"}}>Elige los días que quieres incluir en el resumen.</p>
- {allDays.length===0 ? (
- <div style={{...S.card,textAlign:"center",padding:"32px 20px"}}>
- <p style={{fontSize:14,color:"#b09070",margin:0}}>No hay sesiones aún. Completa alguna práctica primero.</p>
- </div>
- ):(
- <>
- <div style={{display:"flex",justifyContent:"space-between",marginBottom:10}}>
- <button onClick={()=>{const all={};allDays.forEach(d=>{all[d]=true});setExportDays(all);}}
- style={{fontSize:12,background:"none",border:"none",color:"#c8894a",fontWeight:700,cursor:"pointer",fontFamily:"'Nunito',sans-serif"}}>Seleccionar todos</button>
- <button onClick={()=>setExportDays({})}
- style={{fontSize:12,background:"none",border:"none",color:"#b09070",fontWeight:700,cursor:"pointer",fontFamily:"'Nunito',sans-serif"}}>Limpiar selección</button>
- </div>
- <div style={{display:"flex",flexDirection:"column",gap:8,marginBottom:16}}>
- {allDays.map(day=>(
- <div key={day} onClick={()=>setExportDays(x=>({...x,[day]:!x[day]}))}
- style={{display:"flex",alignItems:"center",gap:12,padding:"12px 14px",...S.card,cursor:"pointer",border:`1.5px solid ${exportDays[day]?"#c8894a":"#f0ede8"}`}}>
- <div style={{width:22,height:22,borderRadius:6,border:`2px solid ${exportDays[day]?"#c8894a":"#d4c4b0"}`,background:exportDays[day]?"#c8894a":"white",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,fontSize:12,color:"white"}}>
- {exportDays[day]?"✓":""}
- </div>
- <div style={{flex:1}}>
- <span style={{fontSize:14,fontWeight:700,color:"#3a2010"}}>{fmtDate(day)}</span>
- <span style={{fontSize:12,color:"#b09070",marginLeft:10}}>{(sessions[day]||[]).length} sesiones · {(sessions[day]||[]).reduce((a,s)=>a+s.acorns,0)} </span>
- </div>
- </div>
- ))}
- </div>
- {Object.values(exportDays).some(Boolean) && (
- <div style={{...S.card,marginBottom:14,padding:"14px",maxHeight:220,overflowY:"auto"}}>
- <pre style={{margin:0,fontSize:11,color:"#5a4030",fontFamily:"'Nunito',sans-serif",whiteSpace:"pre-wrap",lineHeight:1.6}}>
- {buildExport(Object.keys(exportDays).filter(d=>exportDays[d]).sort(),sessions,squirrel,acorns)}
- </pre>
- </div>
- )}
- <button onClick={doExport} disabled={!Object.values(exportDays).some(Boolean)}
- style={{width:"100%",padding:"14px",borderRadius:14,border:"none",background:Object.values(exportDays).some(Boolean)?(copied?"linear-gradient(135deg,#7cbf9e,#a8d5ba)":"linear-gradient(135deg,#25D366,#128C7E)"):"#f0e8e0",color:Object.values(exportDays).some(Boolean)?"white":"#c0b0a0",fontSize:15,fontWeight:800,fontFamily:"'Nunito',sans-serif",cursor:Object.values(exportDays).some(Boolean)?"pointer":"default",transition:"all .3s"}}>
- {copied?"✓ ¡Copiado al portapapeles!":" Copiar para WhatsApp"}
- </button>
- </>
- )}
- </div>
- )}
- </div>
- {/* BOTTOM TAB BAR */}
- <div style={{position:"fixed",bottom:0,left:0,right:0,background:"white",borderTop:"1px solid #f0ede8",display:"flex",boxShadow:"0 -4px 20px rgba(0,0,0,.06)"}}>
- {tabs.map(t=>(
- <button key={t.k} onClick={()=>{setView(t.k);setActive(null);}}
- style={{flex:1,padding:"10px 4px 14px",background:"none",border:"none",cursor:"pointer",fontFamily:"'Nunito',sans-serif",display:"flex",flexDirection:"column",alignItems:"center",gap:2}}>
- <span style={{fontSize:20}}>{t.icon}</span>
- <span style={{fontSize:10,fontWeight:700,color:view===t.k?"#c8894a":"#b0a090"}}>{t.label}</span>
- {view===t.k&&<div style={{width:16,height:3,borderRadius:2,background:"#c8894a",marginTop:1}}/>}
- </button>
- ))}
- </div>
- </div>
- );
-}
-// ─── ONBOARDING ───────────────────────────────────────────────────────────────
-function OnboardingScreen({onChoose}) {
- const [picked,setPicked]=useState(null);
- return (
- <div style={{fontFamily:"'Nunito',sans-serif",minHeight:"100vh",background:"linear-gradient(160deg,#fdf8f0,#fef4e4)",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:"24px 20px"}}>
- <link href={FONT_LINK} rel="stylesheet"/>
- <div style={{textAlign:"center",maxWidth:400,width:"100%"}}>
- <div style={{fontSize:48,marginBottom:12}}> </div>
- <h1 style={{margin:"0 0 6px",fontSize:26,fontWeight:900,color:"#3a2010",fontFamily:"'Playfair Display',serif"}}>Elige tu ardilla</h1>
- <p style={{margin:"0 0 28px",fontSize:14,color:"#b09070",lineHeight:1.6}}>Tu compañera de regulación. Irá ganando bellotas contigo cada vez que completes una práctica.</p>
- <div style={{display:"flex",flexDirection:"column",gap:12,marginBottom:28}}>
- {SQUIRRELS.map(s=>(
- <div key={s.id} onClick={()=>setPicked(s)}
- style={{background:picked?.id===s.id?"#fdf0dc":"white",border:`2px solid ${picked?.id===s.id?"#c8894a":"#f0e8d8"}`,borderRadius:18,padding:"16px 20px",cursor:"pointer",transition:"all .2s",display:"flex",alignItems:"center",gap:14,textAlign:"left"}}>
- <div style={{fontSize:36,lineHeight:1,flexShrink:0}}>{s.emoji}</div>
- <div>
- <p style={{margin:"0 0 3px",fontSize:16,fontWeight:800,color:"#3a2010"}}>{s.name}</p>
- <p style={{margin:0,fontSize:13,color:"#9a7050",lineHeight:1.4}}>{s.desc}</p>
- </div>
- {picked?.id===s.id&&<div style={{marginLeft:"auto",width:22,height:22,borderRadius:"50%",background:"#c8894a",display:"flex",alignItems:"center",justifyContent:"center",color:"white",fontSize:13,flexShrink:0}}>✓</div>}
- </div>
- ))}
- </div>
- <button onClick={()=>picked&&onChoose(picked)} disabled={!picked}
- style={{width:"100%",padding:"14px",borderRadius:16,border:"none",background:picked?"linear-gradient(135deg,#c8894a,#e8a060)":"#f0e8e0",color:picked?"white":"#c0b0a0",fontSize:16,fontWeight:900,fontFamily:"'Nunito',sans-serif",cursor:picked?"pointer":"default",transition:"all .2s"}}>
- {picked?`¡Empezar con ${picked.name}! `:"Elige una ardilla para continuar"}
- </button>
- </div>
- </div>
- );
-)
+        // ─── FONTS ───────────────────────────────────────────────────────────────────
+        const FONT_LINK = "https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Playfair+Display:ital,wght@0,700;1,600&display=swap";
+        
+        // ─── SQUIRRELS ───────────────────────────────────────────────────────────────
+        const SQUIRRELS = [
+            { id: "avellana", name: "Avellana", emoji: "🐿️", color: "#c8894a", bg: "#fdf0e0", border: "#f0c88a", desc: "Curiosa y atrevida. Le encanta explorar caminos nuevos." },
+            { id: "nuez", name: "Nuez", emoji: "🐿️", color: "#8a6a3a", bg: "#f5ece0", border: "#d4a870", desc: "Tranquila y sabia. Guarda sus bellotas con mucho cuidado." },
+            { id: "pipa", name: "Pipa", emoji: "🐿️", color: "#b07030", bg: "#fff8ee", border: "#e8b870", desc: "Alegre y decidida. Corre siempre hacia lo que quiere." },
+        ];
+        
+        // ─── DEFAULT PRIZES ──────────────────────────────────────────────────────────
+        const DEFAULT_PRIZES = [
+            { id:"p01", emoji:"🛁", name:"Baño con espuma y velas", cost:8, cat:"Autocuidado" },
+            { id:"p02", emoji:"💆‍♀️", name:"Masaje de 20 minutos", cost:12, cat:"Autocuidado" },
+            { id:"p03", emoji:"🚶‍♀️", name:"Paseo largo sin móvil", cost:4, cat:"Autocuidado" },
+            { id:"p04", emoji:"😴", name:"Siesta sin culpa", cost:3, cat:"Autocuidado" },
+            { id:"p05", emoji:"🧴", name:"Rutina de cremas completa", cost:5, cat:"Autocuidado" },
+            { id:"p06", emoji:"💐", name:"Flores frescas para casa", cost:7, cat:"Autocuidado" },
+            { id:"p07", emoji:"📺", name:"Maratón de tu serie favorita",cost:6, cat:"Ocio" },
+            { id:"p08", emoji:"📖", name:"Tarde entera con un libro", cost:4, cat:"Ocio" },
+            { id:"p09", emoji:"☕", name:"Café especial en tu sitio", cost:5, cat:"Ocio" },
+            { id:"p10", emoji:"🎵", name:"Playlist nueva y bailar sola",cost:2, cat:"Ocio" },
+            { id:"p11", emoji:"🎮", name:"Una hora de juego sin culpa", cost:4, cat:"Ocio" },
+            { id:"p12", emoji:"🍿", name:"Ir al cine tú sola o con alguien",cost:10, cat:"Ocio" },
+            { id:"p13", emoji:"🍰", name:"Tu postre favorito", cost:4, cat:"Capricho" },
+            { id:"p14", emoji:"🍫", name:"Tableta de chocolate de calidad",cost:3,cat:"Capricho" },
+            { id:"p15", emoji:"🥐", name:"Visitar una pastelería chula",cost:6, cat:"Capricho" },
+            { id:"p16", emoji:"🎁", name:"Comprarte algo pequeño bonito",cost:10,cat:"Capricho" },
+            { id:"p17", emoji:"🕯️", name:"Vela aromática nueva", cost:7, cat:"Capricho" },
+            { id:"p18", emoji:"🍵", name:"Infusión especial que te gusta",cost:2, cat:"Capricho" },
+            { id:"p19", emoji:"🌅", name:"Salida a ver un amanecer", cost:8, cat:"Experiencia" },
+            { id:"p20", emoji:"🍽️", name:"Comer fuera sin prisa", cost:10, cat:"Experiencia" },
+            { id:"p21", emoji:"🌳", name:"Tarde en un parque o jardín", cost:5, cat:"Experiencia" },
+            { id:"p22", emoji:"🥂", name:"Quedar con alguien que te guste",cost:8,cat:"Experiencia" },
+            { id:"p23", emoji:"🎨", name:"Tarde creativa: pintar, manualidades",cost:9,cat:"Experiencia" },
+            { id:"p24", emoji:"🏊‍♀️", name:"Ir a la piscina o spa", cost:15, cat:"Experiencia" },
+            { id:"p25", emoji:"💌", name:"Escribirte una carta bonita", cost:4, cat:"Experiencia" },
+        ];
+        
+        const CAT_COLORS = {
+            Autocuidado: { bg:"#fff0f4", border:"#f8c8d4", text:"#a03050" },
+            Ocio: { bg:"#f0f4ff", border:"#c0ccf8", text:"#304090" },
+            Capricho: { bg:"#fdf6e0", border:"#f0d890", text:"#806010" },
+            Experiencia: { bg:"#eef8f0", border:"#b8e0c0", text:"#206030" },
+        };
+        
+        // ─── PRACTICE DATA ────────────────────────────────────────────────────────────
+        const SIGNALS = ["Noto presión en el abdomen","Noto hinchazón o volumen","Noto gases o movimiento intestinal","Noto tensión abdominal","Noto incomodidad difusa","Noto pulsaciones en el abdomen"];
+        const ALARMS = ["Me irrito mucho","Siento miedo de que empeore","Lo rechazo, quiero que desaparezca ya","Empiezo a vigilar y comprobar","Siento que no puedo con esto","Me siento desesperada/o","Me encojo y contengo la respiración","Me aíslo o evito actividades"];
+        const EMOTIONS= ["Miedo","Rabia","Frustración","Impotencia","Asco","Desesperación","Ansiedad","Tristeza"];
+        const BODY_R = ["Se tensa todo el cuerpo","Aprieto la mandíbula","Contengo la respiración","Me encojo hacia dentro","Se acelera el ritmo cardíaco","Aprieto las manos"];
+        const IMPULSES= ["Comprobar si ha mejorado o empeorado","Buscar solución inmediata","Controlar lo que como","Evitar actividades","Quejarme o buscar apoyo urgente","Aislarme"];
+        const REGULAT = ["Solté un 5% de tensión en la mandíbula","Hice una exhalación larga y suave","Nombré la sensación con lenguaje neutro","Me orienté mirando 5 cosas a mi alrededor","Me dije: 'esto es incómodo pero no peligroso'","Seguí con mi actividad aunque el síntoma estaba presente"];
+        const AFTER = ["Sí, bajó un poco la tensión","Sí, la irritación duró menos","Sí, pude seguir con lo que hacía","Un poco, muy levemente","No noté cambio, pero lo intenté","No lo sé todavía"];
+        
+        // ─── HELPERS ─────────────────────────────────────────────────────────────────
+        function useLS(key, def) {
+            const [val, setVal] = useState(() => { try { const s=localStorage.getItem(key); return s?JSON.parse(s):def; } catch{ return def; }});
+            useEffect(()=>{ try{ localStorage.setItem(key,JSON.stringify(val)); }catch{} },[key,val]);
+            return [val,setVal];
+        }
+        function todayStr() { return new Date().toISOString().slice(0,10); }
+        function fmtDate(d) { return new Date(d+"T12:00:00").toLocaleDateString("es-ES",{weekday:"long",day:"numeric",month:"long"}); }
+        
+        // ─── UI ATOMS ─────────────────────────────────────────────────────────────────
+        const S = {
+            card: { background:"white", borderRadius:20, padding:"18px 18px", boxShadow:"0 2px 16px rgba(0,0,0,0.06)", border:"1px solid #f0ede8" },
+        };
+        
+        // SmartSel: desplegable con opción "Otra (personalizada)" que guarda en localStorage
+        function Sel({label, options, value, onChange, lsKey}) {
+            const storageKey = "sq_custom_" + (lsKey || label || "generic");
+            const [customOpts, setCustomOpts] = useState(() => {
+                try { const s=localStorage.getItem(storageKey); return s?JSON.parse(s):[]; } catch{ return []; }
+            });
+            const [showInput, setShowInput] = useState(false);
+            const [draft, setDraft] = useState("");
+            const allOptions = [...options, ...customOpts];
+            const CUSTOM_SENTINEL = "__custom__";
+            
+            function handleChange(v) {
+                if(v === CUSTOM_SENTINEL) { setShowInput(true); }
+                else { setShowInput(false); onChange(v); }
+            }
+            function saveCustom() {
+                const trimmed = draft.trim();
+                if(!trimmed) return;
+                const updated = customOpts.includes(trimmed) ? customOpts : [...customOpts, trimmed];
+                setCustomOpts(updated);
+                try { localStorage.setItem(storageKey, JSON.stringify(updated)); } catch{}
+                onChange(trimmed);
+                setDraft("");
+                setShowInput(false);
+            }
+            function removeCustom(opt, e) {
+                e.stopPropagation();
+                const updated = customOpts.filter(x=>x!==opt);
+                setCustomOpts(updated);
+                try { localStorage.setItem(storageKey, JSON.stringify(updated)); } catch{}
+                if(value===opt) onChange("");
+            }
+            return (
+                <div style={{marginBottom:14}}>
+                    {label && <label style={{display:"block",fontSize:12,color:"#9a8a7a",marginBottom:5,fontWeight:700,letterSpacing:"0.4px",textTransform:"uppercase"}}>{label}</label>}
+                    <select
+                        value={showInput ? CUSTOM_SENTINEL : value}
+                        onChange={e=>handleChange(e.target.value)}
+                        style={{width:"100%",padding:"10px 36px 10px 14px",borderRadius:12,border:`1.5px solid ${value&&!showInput?"#d4b896":"#e8e0d8"}`,background:value&&!showInput?"#fdfaf6":"#faf8f5",color:value&&!showInput?"#3a2a1a":"#bbb0a0",fontSize:14,fontFamily:"'Nunito',sans-serif",outline:"none",cursor:"pointer",appearance:"none",backgroundImage:`url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23c8a878' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E")`,backgroundRepeat:"no-repeat",backgroundPosition:"right 12px center"}}>
+                        <option value="">Elige una opción…</option>
+                        {options.length>0 && <optgroup label="Opciones">
+                            {options.map(o=><option key={o} value={o}>{o}</option>)}
+                        </optgroup>}
+                        {customOpts.length>0 && <optgroup label="Mis opciones personalizadas">
+                            {customOpts.map(o=><option key={o} value={o}>✦ {o}</option>)}
+                        </optgroup>}
+                        <option value={CUSTOM_SENTINEL}> Otra (personalizada)…</option>
+                    </select>
+                    {customOpts.length>0 && !showInput && (
+                        <div style={{display:"flex",flexWrap:"wrap",gap:5,marginTop:6}}>
+                            {customOpts.map(o=>(
+                                <div key={o} style={{display:"flex",alignItems:"center",gap:4,background:"#fdf0dc",border:"1px solid #f0d0a0",borderRadius:20,padding:"2px 8px 2px 10px",fontSize:11,color:"#7a4a1a"}}>
+                                    <span>✦ {o}</span>
+                                    <button onClick={(e)=>removeCustom(o,e)} style={{background:"none",border:"none",cursor:"pointer",color:"#c8894a",fontSize:13,padding:"0 0 0 2px",lineHeight:1,fontWeight:700}}>×</button>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                    {showInput && (
+                        <div style={{marginTop:8,display:"flex",gap:8}}>
+                            <input
+                                autoFocus
+                                value={draft}
+                                onChange={e=>setDraft(e.target.value)}
+                                onKeyDown={e=>{ if(e.key==="Enter") saveCustom(); if(e.key==="Escape"){ setShowInput(false); setDraft(""); }}}
+                                placeholder="Escribe tu opción personalizada…"
+                                style={{flex:1,padding:"9px 12px",borderRadius:10,border:"1.5px solid #c8894a",background:"#fdfaf6",fontSize:14,fontFamily:"'Nunito',sans-serif",color:"#3a2010",outline:"none"}}
+                            />
+                            <button onClick={saveCustom} disabled={!draft.trim()}
+                                style={{padding:"9px 14px",borderRadius:10,border:"none",background:draft.trim()?"#c8894a":"#f0e8e0",color:draft.trim()?"white":"#c0b0a0",fontSize:13,fontWeight:800,cursor:draft.trim()?"pointer":"default",fontFamily:"'Nunito',sans-serif",flexShrink:0}}>
+                                ✓
+                            </button>
+                            <button onClick={()=>{setShowInput(false);setDraft("");}}
+                                style={{padding:"9px 12px",borderRadius:10,border:"1.5px solid #e8ddd0",background:"white",color:"#9a8070",fontSize:13,fontWeight:700,cursor:"pointer",fontFamily:"'Nunito',sans-serif",flexShrink:0}}>
+                                ✕
+                            </button>
+                        </div>
+                    )}
+                </div>
+            );
+        }
+        
+        function TA({label,value,onChange,placeholder}) {
+            return (
+                <div style={{marginBottom:14}}>
+                    {label && <label style={{display:"block",fontSize:12,color:"#9a8a7a",marginBottom:5,fontWeight:700,letterSpacing:"0.4px",textTransform:"uppercase"}}>{label}</label>}
+                    <textarea value={value} onChange={e=>onChange(e.target.value)} placeholder={placeholder} rows={3}
+                        style={{width:"100%",padding:"10px 14px",borderRadius:12,border:"1.5px solid #e8e0d8",background:"#faf8f5",color:"#3a2a1a",fontSize:14,fontFamily:"'Nunito',sans-serif",outline:"none",resize:"vertical",boxSizing:"border-box"}} />
+                </div>
+            );
+        }
+        
+        function Dots({total,current,doneColor="#c8894a"}) {
+            return (
+                <div style={{display:"flex",gap:6,alignItems:"center",marginBottom:18,flexWrap:"wrap"}}>
+                    {Array.from({length:total},(_,i)=>(
+                        <div key={i} style={{display:"flex",alignItems:"center",gap:6}}>
+                            <div style={{width:26,height:26,borderRadius:"50%",background:i<current?"#c8894a":i===current?"#e8a060":"#f0ebe4",color:i<=current?"white":"#c8b8a8",display:"flex",alignItems:"center",justifyContent:"center",fontSize:11,fontWeight:800,transition:"all .3s",flexShrink:0}}>
+                                {i<current?"✓":i+1}
+                            </div>
+                            {i<total-1&&<div style={{width:16,height:2,background:i<current?"#c8894a":"#f0ebe4",borderRadius:2}}/>}
+                        </div>
+                    ))}
+                </div>
+            );
+        }
+        
+        function NextBtn({valid,onNext,last,accent="#c8894a"}) {
+            return (
+                <button onClick={valid?onNext:undefined} disabled={!valid}
+                    style={{width:"100%",padding:"12px",borderRadius:14,border:"none",background:valid?`linear-gradient(135deg,${accent},${accent}cc)`:"#f0ebe4",color:valid?"white":"#c8b8a8",fontSize:14,fontWeight:800,fontFamily:"'Nunito',sans-serif",cursor:valid?"pointer":"default",transition:"all .2s",marginTop:4}}>
+                    {last?" Completar y ganar bellotas →":"Siguiente →"}
+                </button>
+            );
+        }
+        
+        // ─── PRACTICES ───────────────────────────────────────────────────────────────
+        function P1({onDone}) {
+            const [s,setS]=useState(0);
+            const [d,setD]=useState({signal:"",alarm:"",tension:""});
+            const steps=[
+                {t:"¿Qué señal notas en el abdomen?",c:<Sel label="Señal corporal" options={SIGNALS} value={d.signal} onChange={v=>setD(x=>({...x,signal:v}))} lsKey="signals"/>,ok:!!d.signal},
+                {t:"¿Qué alarma aparece?",c:<Sel label="Alarma detectada" options={ALARMS} value={d.alarm} onChange={v=>setD(x=>({...x,alarm:v}))} lsKey="alarms"/>,ok:!!d.alarm},
+                {t:"Frase reguladora",c:(<div style={{padding:"14px 16px",background:"#fdf6ee",borderRadius:14,border:"1px solid #e8d0a8",marginBottom:14}}><p style={{margin:0,fontSize:15,color:"#5a3a1a",fontFamily:"'Playfair Display',serif",fontStyle:"italic",lineHeight:1.7}}>"Esto es incómodo, pero ahora mismo puedo observarlo sin pelear."</p></div>),ok:true},
+                {t:"Suelta un 5% de tensión",c:(
+                    <div style={{display:"flex",flexDirection:"column",gap:8,marginBottom:14}}>
+                        {["Mandíbula → ","Hombros → ","Manos → ","Abdomen → "].map(z=>(
+                            <div key={z} onClick={()=>setD(x=>({...x,tension:z}))} style={{padding:"10px 14px",borderRadius:12,border:`1.5px solid ${d.tension===z?"#c8894a":"#e8e0d8"}`,background:d.tension===z?"#fdf0e0":"#faf8f5",color:"#3a2a1a",fontSize:14,fontFamily:"'Nunito',sans-serif",cursor:"pointer",transition:"all .2s"}}>{z}</div>
+                        ))}
+                    </div>
+                ),ok:!!d.tension},
+            ];
+            const cur=steps[s];
+            return (
+                <div>
+                    <Dots total={steps.length} current={s}/>
+                    <div style={{background:"#fdf6ee",borderRadius:14,padding:"12px 16px",marginBottom:16,border:"1px solid #f0dfc0"}}>
+                        <p style={{margin:0,fontSize:15,fontWeight:800,color:"#7a4a1a"}}>{cur.t}</p>
+                    </div>
+                    {cur.c}
+                    <div style={{display:"flex",gap:8}}>
+                        {s>0&&<button onClick={()=>setS(x=>x-1)} style={{flex:1,padding:"12px",borderRadius:14,border:"1.5px solid #e8ddd0",background:"white",color:"#9a8070",fontSize:14,fontFamily:"'Nunito',sans-serif",cursor:"pointer"}}>← Atrás</button>}
+                        <div style={{flex:2}}><NextBtn valid={cur.ok} onNext={()=>s<steps.length-1?setS(x=>x+1):onDone(d)} last={s===steps.length-1}/></div>
+                    </div>
+                </div>
+            );
+        }
+        
+        function P2({onDone}) {
+            const [s,setS]=useState(0);
+            const [d,setD]=useState({signal:"",thought:"",emotion:"",body:"",impulse:"",need:""});
+            const steps=[
+                {t:"¿Qué sensación aparece?",c:<Sel label="Señal corporal" options={SIGNALS} value={d.signal} onChange={v=>setD(x=>({...x,signal:v}))} lsKey="signals"/>,ok:!!d.signal},
+                {t:"¿Qué pensamiento automático viene?",c:<TA label="Pensamiento automático" value={d.thought} onChange={v=>setD(x=>({...x,thought:v}))} placeholder="Escribe lo primero que piensas al notar la sensación…"/>,ok:!!d.thought},
+                {t:"¿Qué emoción se activa?",c:<Sel label="Emoción principal" options={EMOTIONS} value={d.emotion} onChange={v=>setD(x=>({...x,emotion:v}))} lsKey="emotions"/>,ok:!!d.emotion},
+                {t:"¿Qué hace tu cuerpo?",c:<Sel label="Respuesta corporal" options={BODY_R} value={d.body} onChange={v=>setD(x=>({...x,body:v}))} lsKey="body"/>,ok:!!d.body},
+                {t:"¿Qué impulso aparece?",c:<Sel label="Impulso detectado" options={IMPULSES} value={d.impulse} onChange={v=>setD(x=>({...x,impulse:v}))} lsKey="impulses"/>,ok:!!d.impulse},
+                {t:"¿Qué necesitaría tu sistema ahora?",c:(<><div style={{padding:"10px 14px",background:"#fdf6ee",borderRadius:12,marginBottom:10,border:"1px solid #f0dfc0"}}><p style={{margin:0,fontSize:12,color:"#9a7040",fontStyle:"italic"}}>¿Estoy respondiendo a la señal o a la alarma alrededor de ella?</p></div><TA label="Necesidad del sistema" value={d.need} onChange={v=>setD(x=>({...x,need:v}))} placeholder="Una respiración lenta, notar el apoyo del suelo…"/></>),ok:!!d.need},
+            ];
+            const cur=steps[s];
+            return (
+                <div>
+                    <Dots total={steps.length} current={s}/>
+                    <div style={{background:"#fdf6ee",borderRadius:14,padding:"12px 16px",marginBottom:16,border:"1px solid #f0dfc0"}}>
+                        <p style={{margin:0,fontSize:15,fontWeight:800,color:"#7a4a1a"}}>{cur.t}</p>
+                    </div>
+                    {cur.c}
+                    <div style={{display:"flex",gap:8}}>
+                        {s>0&&<button onClick={()=>setS(x=>x-1)} style={{flex:1,padding:"12px",borderRadius:14,border:"1.5px solid #e8ddd0",background:"white",color:"#9a8070",fontSize:14,fontFamily:"'Nunito',sans-serif",cursor:"pointer"}}>← Atrás</button>}
+                        <div style={{flex:2}}><NextBtn valid={cur.ok} onNext={()=>s<steps.length-1?setS(x=>x+1):onDone(d)} last={s===steps.length-1}/></div>
+                    </div>
+                </div>
+            );
+        }
+        
+        function P3({onDone}) {
+            const [ch,setCh]=useState({});
+            const items=[
+                {k:"orient",i:"👀",t:"Mira lentamente a tu alrededor y nombra 5 cosas que ves."},
+                {k:"support",i:"🪑",t:"Nota 3 puntos de apoyo: pies, espalda, manos o contacto con la silla."},
+                {k:"exhale",i:"🌬️",t:"Exhala un poco más largo de lo habitual, sin forzar."},
+                {k:"release",i:"💆‍♀️",t:"Afloja un 5% alguna zona: mandíbula, hombros, manos, abdomen."},
+                {k:"phrase",i:"🧠",t:'"Ahora estoy aquí; en este momento no necesito resolverlo todo."'},
+                {k:"return",i:"🔁",t:"Vuelve a la actividad que estabas haciendo, aunque sea despacio."},
+            ];
+            const all=items.every(x=>ch[x.k]);
+            return (
+                <div>
+                    <div style={{background:"#fdf6ee",borderRadius:12,padding:"10px 14px",marginBottom:14,border:"1px solid #f0dfc0"}}>
+                        <p style={{margin:0,fontSize:12,color:"#9a7040"}}>Marca cada paso al completarlo.</p>
+                    </div>
+                    <div style={{display:"flex",flexDirection:"column",gap:8,marginBottom:16}}>
+                        {items.map(x=>(
+                            <div key={x.k} onClick={()=>setCh(c=>({...c,[x.k]:!c[x.k]}))}
+                                style={{display:"flex",gap:12,alignItems:"flex-start",padding:"11px 14px",borderRadius:12,background:ch[x.k]?"#fdf0e0":"#faf8f5",border:`1.5px solid ${ch[x.k]?"#c8894a":"#e8e0d8"}`,cursor:"pointer",transition:"all .2s"}}>
+                                <div style={{width:22,height:22,borderRadius:6,border:`2px solid ${ch[x.k]?"#c8894a":"#d4c4b0"}`,background:ch[x.k]?"#c8894a":"white",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,fontSize:12,color:"white",marginTop:1}}>{ch[x.k]?"✓":""}</div>
+                                <span style={{fontSize:14,color:ch[x.k]?"#7a4a1a":"#5a4a3a",fontFamily:"'Nunito',sans-serif",textDecoration:ch[x.k]?"line-through":"none",opacity:ch[x.k]?0.7:1}}><span style={{marginRight:6}}>{x.i}</span>{x.t}</span>
+                            </div>
+                        ))}
+                    </div>
+                    <NextBtn valid={all} onNext={()=>onDone(ch)} last accent="#c8894a"/>
+                </div>
+            );
+        }
+        
+        function PReg({onDone}) {
+            const [s,setS]=useState(0);
+            const [d,setD]=useState({situation:"",signal:"",alarm:"",habitual:"",newResponse:"",after:""});
+            const steps=[
+                {t:"Situación",c:<TA label="¿Dónde estabas y qué hacías?" value={d.situation} onChange={v=>setD(x=>({...x,situation:v}))} placeholder="Ej: en casa trabajando, en el transporte…"/>,ok:!!d.situation},
+                {t:"Señal",c:<Sel label="¿Qué notaste en el abdomen?" options={SIGNALS} value={d.signal} onChange={v=>setD(x=>({...x,signal:v}))} lsKey="signals"/>,ok:!!d.signal},
+                {t:"Alarma",c:<Sel label="¿Qué pensamiento, emoción o impulso apareció?" options={ALARMS} value={d.alarm} onChange={v=>setD(x=>({...x,alarm:v}))} lsKey="alarms"/>,ok:!!d.alarm},
+                {t:"Respuesta habitual",c:<Sel label="¿Qué hiciste?" options={["Vigilar y comprobar","Pelear contra el síntoma","Controlar la alimentación","Evitar actividades","Buscar soluciones inmediatas","Aislarme"]} value={d.habitual} onChange={v=>setD(x=>({...x,habitual:v}))} lsKey="habitual"/>,ok:!!d.habitual},
+                {t:"Nueva respuesta",c:<Sel label="¿Qué probé para reducir la alarma?" options={REGULAT} value={d.newResponse} onChange={v=>setD(x=>({...x,newResponse:v}))} lsKey="regulat"/>,ok:!!d.newResponse},
+                {t:"Después",c:<Sel label="¿Hubo algún cambio?" options={AFTER} value={d.after} onChange={v=>setD(x=>({...x,after:v}))} lsKey="after"/>,ok:!!d.after},
+            ];
+            const cur=steps[s];
+            return (
+                <div>
+                    <Dots total={steps.length} current={s}/>
+                    <div style={{background:"#fdf6ee",borderRadius:14,padding:"12px 16px",marginBottom:16,border:"1px solid #f0dfc0"}}>
+                        <p style={{margin:0,fontSize:15,fontWeight:800,color:"#7a4a1a"}}>{cur.t}</p>
+                    </div>
+                    {cur.c}
+                    <div style={{display:"flex",gap:8}}>
+                        {s>0&&<button onClick={()=>setS(x=>x-1)} style={{flex:1,padding:"12px",borderRadius:14,border:"1.5px solid #e8ddd0",background:"white",color:"#9a8070",fontSize:14,fontFamily:"'Nunito',sans-serif",cursor:"pointer"}}>← Atrás</button>}
+                        <div style={{flex:2}}><NextBtn valid={cur.ok} onNext={()=>s<steps.length-1?setS(x=>x+1):onDone(d)} last={s===steps.length-1}/></div>
+                    </div>
+                </div>
+            );
+        }
+        
+        // ─── PRACTICES CONFIG ────────────────────────────────────────────────────────
+        const PRACTICES=[
+            {id:"p1",num:"01",title:"Señal y alarma",sub:"Observar sin pelear",icon:"🧘‍♀️",acorns:1,comp:P1},
+            {id:"p2",num:"02",title:"Mapa de hiperalerta",sub:"Ampliar conciencia",icon:"🗺️",acorns:2,comp:P2},
+            {id:"p3",num:"03",title:"Orientación suave",sub:"Volver al presente",icon:"🧭",acorns:1,comp:P3},
+            {id:"reg",num:"📝",title:"Registro diario",sub:"Observar el patrón",icon:"📊",acorns:2,comp:PReg},
+        ];
+        
+        // ─── EXPORT FORMATTER ────────────────────────────────────────────────────────
+        function buildExport(days, allSessions, squirrel, totalAcorns) {
+            let txt = ` *Diario de regulación de ${squirrel?.name || "Ardilla"}*\n\n`;
+            days.forEach(day => {
+                const sessions = (allSessions[day]||[]);
+                if(!sessions.length) return;
+                txt += `━━━━━━━━━━━━━━━━━━━━━\n *${fmtDate(day)}*\n`;
+                sessions.forEach((s,i)=>{
+                    txt += `\n *Sesión ${i+1} · ${s.practice}* ${s.time} (+${s.acorns} )\n`;
+                    const d=s.data||{};
+                    if(d.signal) txt+=` Señal: ${d.signal}\n`;
+                    if(d.alarm) txt+=` Alarma: ${d.alarm}\n`;
+                    if(d.thought) txt+=` Pensamiento: ${d.thought}\n`;
+                    if(d.emotion) txt+=` Emoción: ${d.emotion}\n`;
+                    if(d.body) txt+=` Cuerpo: ${d.body}\n`;
+                    if(d.impulse) txt+=` Impulso: ${d.impulse}\n`;
+                    if(d.need) txt+=` Necesidad: ${d.need}\n`;
+                    if(d.tension) txt+=` Soltado: ${d.tension}\n`;
+                    if(d.situation) txt+=` Situación: ${d.situation}\n`;
+                    if(d.habitual) txt+=` Habitual: ${d.habitual}\n`;
+                    if(d.newResponse) txt+=` Nuevo: ${d.newResponse}\n`;
+                    if(d.after) txt+=` Después: ${d.after}\n`;
+                });
+                txt+="\n";
+            });
+            txt+=`━━━━━━━━━━━━━━━━━━━━━\n Total bellotas acumuladas: ${totalAcorns}\n`;
+            txt+=` _"No todo lo incómodo es peligroso."_`;
+            return txt;
+        }
+        
+        // ─── MAIN APP ─────────────────────────────────────────────────────────────────
+        function App() {
+            const [squirrel, setSquirrel] = useLS("sq_squirrel", null);
+            const [acorns, setAcorns] = useLS("sq_acorns", 0);
+            const [sessions, setSessions] = useLS("sq_sessions", {}); 
+            const [prizes, setPrizes] = useLS("sq_prizes", DEFAULT_PRIZES);
+            const [wishlist, setWishlist] = useLS("sq_wishlist", []); 
+            const [redeemed, setRedeemed] = useLS("sq_redeemed", []); 
+            const [view, setView] = useState("home");
+            const [activePractice, setActive] = useState(null);
+            const [toast, setToast] = useState(null);
+            const [shopFilter, setShopFilter] = useState("Todos");
+            const [newPrize, setNewPrize] = useState({emoji:"🎁",name:"",cost:"",cat:"Autocuidado"});
+            const [addingPrize, setAddingPrize]=useState(false);
+            const [exportDays, setExportDays] = useState({});
+            const [copied, setCopied] = useState(false);
+            
+            if (!squirrel) return <OnboardingScreen onChoose={s=>{setSquirrel(s);}} />;
+            
+            const today = todayStr();
+            const todaySessions = sessions[today]||[];
+            const allDays = Object.keys(sessions).sort().reverse();
+            
+            function showToast(msg, dur=3000) {
+                setToast(msg);
+                setTimeout(()=>setToast(null), dur);
+            }
+            
+            function handlePracticeDone(practice, data) {
+                const session = { id:Date.now(), practice:practice.title, acorns:practice.acorns, time:new Date().toLocaleTimeString("es-ES",{hour:"2-digit",minute:"2-digit"}), data };
+                setSessions(s => ({ ...s, [today]: [...(s[today]||[]), session] }));
+                setAcorns(a => a + practice.acorns);
+                setView("home");
+                setActive(null);
+                showToast(` +${practice.acorns} bellota${practice.acorns>1?"s":""} para ${squirrel.name}!`);
+            }
+            
+            function redeemPrize(prize) {
+                if(acorns < prize.cost) { showToast(" ¡No tienes suficientes bellotas!"); return; }
+                setAcorns(a=>a-prize.cost);
+                setRedeemed(r=>[...r,{prizeId:prize.id,name:prize.name,emoji:prize.emoji,at:new Date().toISOString(),acornsCost:prize.cost}]);
+                showToast(` ¡${prize.emoji} ${prize.name} canjeado!`);
+            }
+            
+            function toggleWish(prize) {
+                if(wishlist.find(w=>w.prizeId===prize.id)) {
+                    setWishlist(w=>w.filter(x=>x.prizeId!==prize.id));
+                } else {
+                    setWishlist(w=>[...w,{prizeId:prize.id,name:prize.name,emoji:prize.emoji,addedAt:new Date().toISOString()}]);
+                }
+            }
+            
+            function addCustomPrize() {
+                if(!newPrize.name||!newPrize.cost) return;
+                const np={...newPrize, id:"c"+Date.now(), cost:parseInt(newPrize.cost)||5};
+                setPrizes(p=>[...p,np]);
+                setNewPrize({emoji:"🎁",name:"",cost:"",cat:"Autocuidado"});
+                setAddingPrize(false);
+                showToast(" Premio añadido a la tienda");
+            }
+            
+            function doExport() {
+                const chosen = Object.keys(exportDays).filter(d=>exportDays[d]);
+                if(!chosen.length){ showToast("Selecciona al menos un día"); return; }
+                const txt = buildExport(chosen.sort(), sessions, squirrel, acorns);
+                navigator.clipboard.writeText(txt).then(()=>{ setCopied(true); setTimeout(()=>setCopied(false),2500); });
+            }
+            
+            const isInWish = (id) => !!wishlist.find(w=>w.prizeId===id);
+            const cats = ["Todos","Autocuidado","Ocio","Capricho","Experiencia"];
+            const filteredPrizes = shopFilter==="Todos" ? prizes : prizes.filter(p=>p.cat===shopFilter);
+            
+            const tabs=[
+                {k:"home",icon:"🏠",label:"Inicio"},
+                {k:"shop",icon:"🛍️",label:"Tienda"},
+                {k:"history",icon:"📅",label:"Historial"},
+                {k:"export",icon:"📤",label:"Exportar"},
+            ];
+            
+            return (
+                <div style={{fontFamily:"'Nunito',sans-serif",minHeight:"100vh",background:"linear-gradient(160deg,#fdf8f0 0%,#fef6e8 60%,#f8f0e8 100%)"}}>
+                    <link href={FONT_LINK} rel="stylesheet"/>
+                    <style>{`
+                        @keyframes slideDown{from{opacity:0;transform:translateX(-50%) translateY(-16px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+                        @keyframes acornPop{0%{transform:scale(0.7);opacity:0}60%{transform:scale(1.15)}100%{transform:scale(1);opacity:1}}
+                        * { box-sizing:border-box; }
+                        ::-webkit-scrollbar{width:6px} ::-webkit-scrollbar-track{background:transparent} ::-webkit-scrollbar-thumb{background:#e0d0c0;border-radius:4px}
+                    `}</style>
+                    
+                    {toast && (
+                        <div style={{position:"fixed",top:18,left:"50%",transform:"translateX(-50%)",background:"#3a2a1a",color:"white",borderRadius:16,padding:"11px 22px",zIndex:9999,boxShadow:"0 8px 24px rgba(0,0,0,.18)",animation:"slideDown .35s ease",whiteSpace:"nowrap",maxWidth:"90vw",fontSize:14,fontWeight:700}}>
+                            {toast}
+                        </div>
+                    )}
+                    
+                    <div style={{maxWidth:460,margin:"0 auto",padding:"0 16px 90px"}}>
+                        <div style={{paddingTop:22,paddingBottom:4}}>
+                            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+                                <div>
+                                    <h1 style={{margin:0,fontSize:20,fontWeight:900,color:"#3a2010",fontFamily:"'Playfair Display',serif",letterSpacing:"-.3px"}}>
+                                        {squirrel.emoji} {squirrel.name}
+                                    </h1>
+                                    <p style={{margin:"2px 0 0",fontSize:12,color:"#b09070"}}>Regulación del sistema nervioso</p>
+                                </div>
+                                <div style={{textAlign:"right"}}>
+                                    <div style={{fontSize:26,fontWeight:900,color:"#c8894a",fontFamily:"'Playfair Display',serif",lineHeight:1}}>
+                                        {acorns} <span style={{fontSize:18}}>🌰</span>
+                                    </div>
+                                    <p style={{margin:0,fontSize:11,color:"#b09070"}}>bellotas</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        {view==="home" && !activePractice && (
+                            <div>
+                                <div style={{...S.card,margin:"14px 0",padding:"16px 18px",background:"linear-gradient(135deg,#fdf0dc,#fae8c8)",border:"1.5px solid #f0d09a"}}>
+                                    <p style={{margin:0,fontSize:13,color:"#7a4a1a",lineHeight:1.6,fontStyle:"italic",fontFamily:"'Playfair Display',serif"}}>
+                                        "No todo lo incómodo es peligroso."
+                                    </p>
+                                    <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginTop:10}}>
+                                        <span style={{fontSize:12,color:"#b09060"}}>Sesiones hoy: <b>{todaySessions.length}</b></span>
+                                        <span style={{fontSize:12,color:"#b09060"}}>Bellotas hoy: <b>{todaySessions.reduce((a,s)=>a+s.acorns,0)}</b></span>
+                                    </div>
+                                </div>
+                                <p style={{fontSize:12,color:"#b09070",margin:"0 0 12px",textTransform:"uppercase",letterSpacing:"0.6px",fontWeight:700}}>Elige una práctica</p>
+                                <div style={{display:"flex",flexDirection:"column",gap:10}}>
+                                    {PRACTICES.map(p=>(
+                                        <div key={p.id} onClick={()=>{setActive(p);setView("practice");}}
+                                            style={{...S.card,display:"flex",alignItems:"center",gap:14,cursor:"pointer",transition:"transform .15s, box-shadow .15s",padding:"14px 16px"}}
+                                            onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-1px)";e.currentTarget.style.boxShadow="0 6px 24px rgba(0,0,0,.1)"}}
+                                            onMouseLeave={e=>{e.currentTarget.style.transform="";e.currentTarget.style.boxShadow=S.card.boxShadow}}>
+                                            <div style={{width:46,height:46,borderRadius:14,background:"#fdf0dc",display:"flex",alignItems:"center",justifyContent:"center",fontSize:22,flexShrink:0,border:"1px solid #f0d8a8"}}>
+                                                {p.icon}
+                                            </div>
+                                            <div style={{flex:1}}>
+                                                <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+                                                    <span style={{fontSize:10,color:"#c8894a",fontWeight:700,textTransform:"uppercase",letterSpacing:"0.5px"}}>Práctica {p.num}</span>
+                                                    <span style={{fontSize:12,background:"#fdf0dc",color:"#8a5a1a",padding:"2px 9px",borderRadius:8,fontWeight:800,border:"1px solid #f0d0a0"}}>+{p.acorns} 🌰</span>
+                                                </div>
+                                                <p style={{margin:"3px 0 1px",fontSize:15,fontWeight:800,color:"#3a2010"}}>{p.title}</p>
+                                                <p style={{margin:0,fontSize:12,color:"#b09070"}}>{p.sub}</p>
+                                            </div>
+                                            <span style={{color:"#c8894a",fontSize:18}}>›</span>
+                                        </div>
+                                    ))}
+                                </div>
+                                {wishlist.length>0 && (
+                                    <div style={{...S.card,margin:"16px 0",padding:"14px 16px"}}>
+                                        <p style={{margin:"0 0 10px",fontSize:12,color:"#b09070",fontWeight:700,textTransform:"uppercase",letterSpacing:"0.5px"}}>Lista de deseos ✨</p>
+                                        {wishlist.map(w=>(
+                                            <div key={w.prizeId} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"6px 0",borderBottom:"1px solid #f5ede0"}}>
+                                                <span style={{fontSize:14,color:"#3a2010"}}>{w.emoji} {w.name}</span>
+                                                <span style={{fontSize:11,color:"#c8894a",fontWeight:700}}>{prizes.find(p=>p.id===w.prizeId)?.cost||"?"} 🌰</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                        
+                        {view==="practice" && activePractice && (
+                            <div>
+                                <button onClick={()=>{setView("home");setActive(null);}} style={{background:"none",border:"none",color:"#c8894a",fontSize:14,fontFamily:"'Nunito',sans-serif",cursor:"pointer",marginBottom:14,padding:0,display:"flex",alignItems:"center",gap:6,fontWeight:700}}>
+                                    ← Volver
+                                </button>
+                                <div style={{...S.card}}>
+                                    <div style={{marginBottom:16}}>
+                                        <span style={{fontSize:28}}>{activePractice.icon}</span>
+                                        <h2 style={{margin:"8px 0 2px",fontSize:18,fontWeight:900,color:"#3a2010",fontFamily:"'Playfair Display',serif"}}>{activePractice.title}</h2>
+                                        <p style={{margin:0,fontSize:13,color:"#b09070"}}>{activePractice.sub} · <b style={{color:"#c8894a"}}>+{activePractice.acorns} 🌰</b></p>
+                                    </div>
+                                    <activePractice.comp onDone={(d)=>handlePracticeDone(activePractice,d)}/>
+                                </div>
+                            </div>
+                        )}
+                        
+                        {view==="shop" && (
+                            <div>
+                                <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",margin:"14px 0 6px"}}>
+                                    <h2 style={{margin:0,fontSize:18,fontWeight:900,color:"#3a2010",fontFamily:"'Playfair Display',serif"}}>Tienda de premios</h2>
+                                    <div style={{background:"#fdf0dc",borderRadius:10,padding:"5px 12px",border:"1px solid #f0d0a0"}}>
+                                        <span style={{fontSize:14,fontWeight:800,color:"#c8894a"}}>{acorns} 🌰</span>
+                                    </div>
+                                </div>
+                                <div style={{display:"flex",gap:6,overflowX:"auto",paddingBottom:4,marginBottom:14}}>
+                                    {cats.map(c=>(
+                                        <button key={c} onClick={()=>setShopFilter(c)}
+                                            style={{flexShrink:0,padding:"6px 14px",borderRadius:20,border:`1.5px solid ${shopFilter===c?"#c8894a":"#e8ddd0"}`,background:shopFilter===c?"#fdf0dc":"white",color:shopFilter===c?"#7a4a1a":"#9a8070",fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"'Nunito',sans-serif",transition:"all .2s"}}>
+                                            {c}
+                                        </button>
+                                    ))}
+                                </div>
+                                <div style={{display:"flex",flexDirection:"column",gap:10,marginBottom:14}}>
+                                    {filteredPrizes.map(p=>{
+                                        const catC=CAT_COLORS[p.cat]||{bg:"#f8f5f0",border:"#e8e0d0",text:"#5a4a3a"};
+                                        const canAfford=acorns>=p.cost;
+                                        const inWish=isInWish(p.id);
+                                        return (
+                                            <div key={p.id} style={{...S.card,padding:"13px 16px",opacity:canAfford?1:0.75}}>
+                                                <div style={{display:"flex",alignItems:"center",gap:12}}>
+                                                    <div style={{fontSize:26,flexShrink:0}}>{p.emoji}</div>
+                                                    <div style={{flex:1}}>
+                                                        <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:2}}>
+                                                            <span style={{fontSize:10,background:catC.bg,color:catC.text,padding:"1px 7px",borderRadius:6,fontWeight:700,border:`1px solid ${catC.border}`}}>{p.cat}</span>
+                                                            <span style={{fontSize:12,fontWeight:800,color:canAfford?"#c8894a":"#c0a888"}}>{p.cost} 🌰</span>
+                                                        </div>
+                                                        <p style={{margin:0,fontSize:14,fontWeight:700,color:"#3a2010"}}>{p.name}</p>
+                                                    </div>
+                                                </div>
+                                                <div style={{display:"flex",gap:8,marginTop:10}}>
+                                                    <button onClick={()=>toggleWish(p)}
+                                                        style={{flex:1,padding:"8px",borderRadius:10,border:`1.5px solid ${inWish?"#f4c0a0":"#e8ddd0"}`,background:inWish?"#fdf6ee":"white",color:inWish?"#c8694a":"#9a8070",fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"'Nunito',sans-serif"}}>
+                                                        {inWish?" ✓ En lista":"♡ Deseo"}
+                                                    </button>
+                                                    <button onClick={()=>redeemPrize(p)} disabled={!canAfford}
+                                                        style={{flex:2,padding:"8px",borderRadius:10,border:"none",background:canAfford?"linear-gradient(135deg,#c8894a,#e8a060)":"#f0e8e0",color:canAfford?"white":"#c0b0a0",fontSize:12,fontWeight:800,cursor:canAfford?"pointer":"default",fontFamily:"'Nunito',sans-serif",transition:"all .2s"}}>
+                                                        {canAfford?" Canjear":"Faltan "+(p.cost-acorns)+" 🌰"}
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                                {!addingPrize ? (
+                                    <button onClick={()=>setAddingPrize(true)}
+                                        style={{width:"100%",padding:"12px",borderRadius:14,border:"2px dashed #e0d0c0",background:"transparent",color:"#c8a070",fontSize:14,fontWeight:700,cursor:"pointer",fontFamily:"'Nunito',sans-serif"}}>
+                                        + Añadir premio personalizado
+                                    </button>
+                                ):(
+                                    <div style={{...S.card,marginBottom:8}}>
+                                        <p style={{margin:"0 0 12px",fontSize:14,fontWeight:800,color:"#3a2010"}}>Nuevo premio</p>
+                                        <div style={{display:"flex",gap:8,marginBottom:10}}>
+                                            <input value={newPrize.emoji} onChange={e=>setNewPrize(x=>({...x,emoji:e.target.value}))}
+                                                style={{width:56,padding:"9px",borderRadius:10,border:"1.5px solid #e8ddd0",background:"#faf8f5",fontSize:18,textAlign:"center",outline:"none"}}/>
+                                            <input value={newPrize.name} onChange={e=>setNewPrize(x=>({...x,name:e.target.value}))}
+                                                placeholder="Nombre del premio…" style={{flex:1,padding:"9px 12px",borderRadius:10,border:"1.5px solid #e8ddd0",background:"#faf8f5",fontSize:14,fontFamily:"'Nunito',sans-serif",color:"#3a2010",outline:"none"}}/>
+                                        </div>
+                                        <div style={{display:"flex",gap:8,marginBottom:12}}>
+                                            <input type="number" value={newPrize.cost} onChange={e=>setNewPrize(x=>({...x,cost:e.target.value}))}
+                                                placeholder="🌰 coste" style={{width:90,padding:"9px 12px",borderRadius:10,border:"1.5px solid #e8ddd0",background:"#faf8f5",fontSize:14,fontFamily:"'Nunito',sans-serif",color:"#3a2010",outline:"none"}}/>
+                                            <select value={newPrize.cat} onChange={e=>setNewPrize(x=>({...x,cat:e.target.value}))}
+                                                style={{flex:1,padding:"9px 12px",borderRadius:10,border:"1.5px solid #e8ddd0",background:"#faf8f5",fontSize:14,fontFamily:"'Nunito',sans-serif",color:"#3a2010",outline:"none"}}>
+                                                {["Autocuidado","Ocio","Capricho","Experiencia"].map(c=><option key={c}>{c}</option>)}
+                                            </select>
+                                        </div>
+                                        <div style={{display:"flex",gap:8}}>
+                                            <button onClick={()=>setAddingPrize(false)} style={{flex:1,padding:"10px",borderRadius:12,border:"1.5px solid #e8ddd0",background:"white",color:"#9a8070",fontSize:13,fontWeight:700,cursor:"pointer",fontFamily:"'Nunito',sans-serif"}}>Cancelar</button>
+                                            <button onClick={addCustomPrize} disabled={!newPrize.name||!newPrize.cost}
+                                                style={{flex:2,padding:"10px",borderRadius:12,border:"none",background:(newPrize.name&&newPrize.cost)?"linear-gradient(135deg,#c8894a,#e8a060)":"#f0e8e0",color:(newPrize.name&&newPrize.cost)?"white":"#c0b0a0",fontSize:13,fontWeight:800,cursor:(newPrize.name&&newPrize.cost)?"pointer":"default",fontFamily:"'Nunito',sans-serif"}}>
+                                                ✓ Añadir
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
+                                {redeemed.length>0&&(
+                                    <div style={{...S.card,marginTop:14,padding:"14px 16px"}}>
+                                        <p style={{margin:"0 0 10px",fontSize:12,color:"#b09070",fontWeight:700,textTransform:"uppercase",letterSpacing:"0.5px"}}>Premios canjeados ✓</p>
+                                        {redeemed.slice().reverse().map((r,i)=>(
+                                            <div key={i} style={{display:"flex",justifyContent:"space-between",padding:"5px 0",borderBottom:"1px solid #f5ede0",fontSize:13,color:"#7a5a3a"}}>
+                                                <span>{r.emoji} {r.name}</span>
+                                                <span style={{color:"#c8894a",fontWeight:700}}>-{r.acornsCost} 🌰</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                        
+                        {view==="history" && (
+                            <div>
+                                <h2 style={{margin:"14px 0 14px",fontSize:18,fontWeight:900,color:"#3a2010",fontFamily:"'Playfair Display',serif"}}>Historial</h2>
+                                {allDays.length===0 ? (
+                                    <div style={{...S.card,textAlign:"center",padding:"36px 20px"}}>
+                                        <p style={{fontSize:32,margin:"0 0 8px"}}>📅</p>
+                                        <p style={{fontSize:14,color:"#b09070",margin:0}}>Aún no hay sesiones registradas.<br/>¡Empieza con una práctica!</p>
+                                    </div>
+                                ):(
+                                    allDays.map(day=>(
+                                        <div key={day} style={{...S.card,marginBottom:12,padding:"14px 16px"}}>
+                                            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
+                                                <span style={{fontSize:14,fontWeight:800,color:"#3a2010"}}>{fmtDate(day)}</span>
+                                                <span style={{fontSize:12,background:"#fdf0dc",color:"#c8894a",padding:"2px 10px",borderRadius:8,fontWeight:800,border:"1px solid #f0d0a0"}}>
+                                                    {(sessions[day]||[]).reduce((a,s)=>a+s.acorns,0)} 🌰
+                                                </span>
+                                            </div>
+                                            {(sessions[day]||[]).map((s,i)=>(
+                                                <div key={s.id} style={{padding:"8px 10px",background:"#faf6f0",borderRadius:10,marginBottom:6}}>
+                                                    <div style={{display:"flex",justifyContent:"space-between"}}>
+                                                        <span style={{fontSize:13,fontWeight:700,color:"#5a3a1a"}}>{s.practice}</span>
+                                                        <span style={{fontSize:11,color:"#b09070"}}> {s.time} · +{s.acorns} 🌰</span>
+                                                    </div>
+                                                    {s.data?.signal&&<p style={{margin:"3px 0 0",fontSize:12,color:"#7a6050"}}> {s.data.signal}</p>}
+                                                    {s.data?.newResponse&&<p style={{margin:"2px 0 0",fontSize:12,color:"#7a6050"}}> {s.data.newResponse}</p>}
+                                                    {s.data?.after&&<p style={{margin:"2px 0 0",fontSize:12,color:"#7a6050"}}> {s.data.after}</p>}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    ))
+                                )}
+                            </div>
+                        )}
+                        
+                        {view==="export" && (
+                            <div>
+                                <h2 style={{margin:"14px 0 6px",fontSize:18,fontWeight:900,color:"#3a2010",fontFamily:"'Playfair Display',serif"}}>Exportar a WhatsApp</h2>
+                                <p style={{fontSize:13,color:"#b09070",margin:"0 0 16px"}}>Elige los días que quieres incluir en el resumen.</p>
+                                {allDays.length===0 ? (
+                                    <div style={{...S.card,textAlign:"center",padding:"32px 20px"}}>
+                                        <p style={{fontSize:14,color:"#b09070",margin:0}}>No hay sesiones aún. Completa alguna práctica primero.</p>
+                                    </div>
+                                ):(
+                                    <>
+                                        <div style={{display:"flex",justifyContent:"space-between",marginBottom:10}}>
+                                            <button onClick={()=>{const all={};allDays.forEach(d=>{all[d]=true});setExportDays(all);}}
+                                                style={{fontSize:12,background:"none",border:"none",color:"#c8894a",fontWeight:700,cursor:"pointer",fontFamily:"'Nunito',sans-serif"}}>Seleccionar todos</button>
+                                            <button onClick={()=>setExportDays({})}
+                                                style={{fontSize:12,background:"none",border:"none",color:"#b09070",fontWeight:700,cursor:"pointer",fontFamily:"'Nunito',sans-serif"}}>Limpiar selección</button>
+                                        </div>
+                                        <div style={{display:"flex",flexDirection:"column",gap:8,marginBottom:16}}>
+                                            {allDays.map(day=>(
+                                                <div key={day} onClick={()=>setExportDays(x=>({...x,[day]:!x[day]}))}
+                                                    style={{display:"flex",alignItems:"center",gap:12,padding:"12px 14px",...S.card,cursor:"pointer",border:`1.5px solid ${exportDays[day]?"#c8894a":"#f0ede8"}`}}>
+                                                    <div style={{width:22,height:22,borderRadius:6,border:`2px solid ${exportDays[day]?"#c8894a":"#d4c4b0"}`,background:exportDays[day]?"#c8894a":"white",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,fontSize:12,color:"white"}}>
+                                                        {exportDays[day]?"✓":""}
+                                                    </div>
+                                                    <div style={{flex:1}}>
+                                                        <span style={{fontSize:14,fontWeight:700,color:"#3a2010"}}>{fmtDate(day)}</span>
+                                                        <span style={{fontSize:12,color:"#b09070",marginLeft:10}}>{(sessions[day]||[]).length} sesiones · {(sessions[day]||[]).reduce((a,s)=>a+s.acorns,0)} 🌰</span>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                        {Object.values(exportDays).some(Boolean) && (
+                                            <div style={{...S.card,marginBottom:14,padding:"14px",maxHeight:220,overflowY:"auto"}}>
+                                                <pre style={{margin:0,fontSize:11,color:"#5a4030",fontFamily:"'Nunito',sans-serif",whiteSpace:"pre-wrap",lineHeight:1.6}}>
+                                                    {buildExport(Object.keys(exportDays).filter(d=>exportDays[d]).sort(),sessions,squirrel,acorns)}
+                                                </pre>
+                                            </div>
+                                        )}
+                                        <button onClick={doExport} disabled={!Object.values(exportDays).some(Boolean)}
+                                            style={{width:"100%",padding:"14px",borderRadius:14,border:"none",background:Object.values(exportDays).some(Boolean)?(copied?"linear-gradient(135deg,#7cbf9e,#a8d5ba)":"linear-gradient(135deg,#25D366,#128C7E)"):"#f0e8e0",color:Object.values(exportDays).some(Boolean)?"white":"#c0b0a0",fontSize:15,fontWeight:800,fontFamily:"'Nunito',sans-serif",cursor:Object.values(exportDays).some(Boolean)?"pointer":"default",transition:"all .3s"}}>
+                                            {copied?"✓ ¡Copiado al portapapeles!":" Copiar para WhatsApp"}
+                                        </button>
+                                    </>
+                                )}
+                            </div>
+                        )}
+                    </div>
+                    
+                    <div style={{position:"fixed",bottom:0,left:0,right:0,background:"white",borderTop:"1px solid #f0ede8",display:"flex",boxShadow:"0 -4px 20px rgba(0,0,0,.06)"}}>
+                        {tabs.map(t=>(
+                            <button key={t.k} onClick={()=>{setView(t.k);setActive(null);}}
+                                style={{flex:1,padding:"10px 4px 14px",background:"none",border:"none",cursor:"pointer",fontFamily:"'Nunito',sans-serif",display:"flex",flexDirection:"column",alignItems:"center",gap:2}}>
+                                <span style={{fontSize:20}}>{t.icon}</span>
+                                <span style={{fontSize:10,fontWeight:700,color:view===t.k?"#c8894a":"#b0a090"}}>{t.label}</span>
+                                {view===t.k&&<div style={{width:16,height:3,borderRadius:2,background:"#c8894a",marginTop:1}}/>}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            );
+        }
+        
+        // ─── ONBOARDING ───────────────────────────────────────────────────────────────
+        function OnboardingScreen({onChoose}) {
+            const [picked,setPicked]=useState(null);
+            return (
+                <div style={{fontFamily:"'Nunito',sans-serif",minHeight:"100vh",background:"linear-gradient(160deg,#fdf8f0,#fef4e4)",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:"24px 20px"}}>
+                    <link href={FONT_LINK} rel="stylesheet"/>
+                    <div style={{textAlign:"center",maxWidth:400,width:"100%"}}>
+                        <div style={{fontSize:48,marginBottom:12}}>🌰</div>
+                        <h1 style={{margin:"0 0 6px",fontSize:26,fontWeight:900,color:"#3a2010",fontFamily:"'Playfair Display',serif"}}>Elige tu ardilla</h1>
+                        <p style={{margin:"0 0 28px",fontSize:14,color:"#b09070",lineHeight:1.6}}>Tu compañera de regulación. Irá ganando bellotas contigo cada vez que completes una práctica.</p>
+                        <div style={{display:"flex",flexDirection:"column",gap:12,marginBottom:28}}>
+                            {SQUIRRELS.map(s=>(
+                                <div key={s.id} onClick={()=>setPicked(s)}
+                                    style={{background:picked?.id===s.id?"#fdf0dc":"white",border:`2px solid ${picked?.id===s.id?"#c8894a":"#f0e8d8"}`,borderRadius:18,padding:"16px 20px",cursor:"pointer",transition:"all .2s",display:"flex",alignItems:"center",gap:14,textAlign:"left"}}>
+                                    <div style={{fontSize:36,lineHeight:1,flexShrink:0}}>{s.emoji}</div>
+                                    <div>
+                                        <p style={{margin:"0 0 3px",fontSize:16,fontWeight:800,color:"#3a2010"}}>{s.name}</p>
+                                        <p style={{margin:0,fontSize:13,color:"#9a7050",lineHeight:1.4}}>{s.desc}</p>
+                                    </div>
+                                    {picked?.id===s.id&&<div style={{marginLeft:"auto",width:22,height:22,borderRadius:"50%",background:"#c8894a",display:"flex",alignItems:"center",justifyContent:"center",color:"white",fontSize:13,flexShrink:0}}>✓</div>}
+                                </div>
+                            ))}
+                        </div>
+                        <button onClick={()=>picked&&onChoose(picked)} disabled={!picked}
+                            style={{width:"100%",padding:"14px",borderRadius:16,border:"none",background:picked?"linear-gradient(135deg,#c8894a,#e8a060)":"#f0e8e0",color:picked?"white":"#c0b0a0",fontSize:16,fontWeight:900,fontFamily:"'Nunito',sans-serif",cursor:picked?"pointer":"default",transition:"all .2s"}}>
+                            {picked?`¡Empezar con ${picked.name}! `:"Elige una ardilla para continuar"}
+                        </button>
+                    </div>
+                </div>
+            );
+        }
         
         const root = ReactDOM.createRoot(document.getElementById('root'));
         root.render(<App />);
